@@ -95,15 +95,11 @@ if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
     initCustomCursor();
     initNavbarHeightTracking();
-    initLogoSpinRadius();
   });
 } else {
   initCustomCursor();
   initNavbarHeightTracking();
-  initLogoSpinRadius();
 }
-
-/* ── Dynamic navbar height → keeps content from being covered ── */
 function initNavbarHeightTracking() {
   const navbar  = document.querySelector('.navbar');
   const mainEl  = document.querySelector('main.wrap');
@@ -125,39 +121,6 @@ function initNavbarHeightTracking() {
   }
 }
 
-/* ── Logo spin with hysteresis — enter radius 80px, exit 130px ── */
-function initLogoSpinRadius() {
-  const logo = document.querySelector('.brand-logo');
-  if (!logo) return;
-
-  const ENTER_RADIUS = 80;   // px — cursor must come this close to start spinning
-  const EXIT_RADIUS  = 130;  // px — cursor must leave this far to un-spin
-
-  let spinning = false;
-  let currentAngle = 0;      // track accumulated rotation so transition stays smooth
-
-  document.addEventListener('mousemove', e => {
-    const rect   = logo.getBoundingClientRect();
-    const cx     = rect.left + rect.width  / 2;
-    const cy     = rect.top  + rect.height / 2;
-    const dist   = Math.hypot(e.clientX - cx, e.clientY - cy);
-
-    if (!spinning && dist <= ENTER_RADIUS) {
-      spinning = true;
-      currentAngle += 360;
-      logo.style.transition = 'transform 0.7s cubic-bezier(0.4, 0, 0.2, 1), filter 0.3s ease';
-      logo.style.transform  = `rotate(${currentAngle}deg) scale(1.12)`;
-      logo.style.filter     = 'drop-shadow(0 0 14px rgba(125, 211, 252, 0.9))';
-    } else if (spinning && dist > EXIT_RADIUS) {
-      spinning = false;
-      // Snap angle to nearest 360 multiple so un-spin looks clean
-      currentAngle = Math.round(currentAngle / 360) * 360;
-      logo.style.transition = 'transform 0.7s cubic-bezier(0.4, 0, 0.2, 1), filter 0.3s ease';
-      logo.style.transform  = `rotate(${currentAngle}deg) scale(1)`;
-      logo.style.filter     = 'drop-shadow(0 0 8px rgba(125, 211, 252, 0.5))';
-    }
-  });
-}
 
 async function showSection(target) {
   const sections = main.querySelectorAll('section');

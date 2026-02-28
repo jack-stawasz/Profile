@@ -290,21 +290,7 @@ main.hidden {
   flex-shrink: 0;
   filter: drop-shadow(0 0 8px rgba(125, 211, 252, 0.5));
   overflow: visible;
-  /* Spin animation controlled by JS radius logic */
-  transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1),
-              filter 0.3s ease;
-  transform-origin: center;
-  will-change: transform;
-}
-
-.brand-logo.logo-spinning {
-  transform: rotate(360deg) scale(1.12);
-  filter: drop-shadow(0 0 14px rgba(125, 211, 252, 0.9));
-}
-
-.brand-logo.logo-unspinning {
-  transform: rotate(0deg) scale(1);
-  filter: drop-shadow(0 0 8px rgba(125, 211, 252, 0.5));
+  transition: filter 0.3s ease;
 }
 
 .nav-left .brand {
