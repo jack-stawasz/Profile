@@ -1,133 +1,70 @@
 const links = document.querySelectorAll('.nav-links a');
-const main = document.getElementById('main-content');
+const main  = document.getElementById('main-content');
 
 let cursor, cursorDot;
-let mouseX = 0, mouseY = 0;
 
 function initCustomCursor() {
-  cursor = document.createElement('div');
-  cursor.className = 'custom-cursor';
-  
+  cursor    = document.createElement('div');
   cursorDot = document.createElement('div');
+  cursor.className    = 'custom-cursor';
   cursorDot.className = 'custom-cursor-dot';
   cursor.appendChild(cursorDot);
-  
   document.body.appendChild(cursor);
   document.body.classList.add('custom-cursor-enabled');
-  
-  document.addEventListener('mousemove', (e) => {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-    cursor.style.left = mouseX + 'px';
-    cursor.style.top = mouseY + 'px';
+
+  document.addEventListener('mousemove', e => {
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top  = e.clientY + 'px';
     cursor.classList.add('active');
-    
-    const target = e.target;
-    const isClickable = target.closest('a, button, input, select, .project-card, .course-card, .exp-tab, .category-bookmark, .carousel-btn, .indicator-dot, [role="button"]');
+    const isClickable = e.target.closest(
+      'a, button, input, select, .project-card, .course-card, .exp-tab, .category-bookmark, .carousel-btn, .indicator-dot, [role="button"]'
+    );
     cursor.classList.toggle('hovering', !!isClickable);
   });
-  
-  document.addEventListener('mouseleave', () => {
-    cursor.classList.remove('active', 'hovering');
-  });
-  
-  document.addEventListener('mouseenter', () => {
-    cursor.classList.add('active');
-  });
-  
-  document.addEventListener('mousedown', (e) => {
-    cursor.classList.add('clicking');
-    createRipple(e.clientX, e.clientY);
-  });
-  
-  document.addEventListener('mouseup', () => {
-    cursor.classList.remove('clicking');
-  });
+
+  document.addEventListener('mouseleave', () => cursor.classList.remove('active', 'hovering'));
+  document.addEventListener('mouseenter', () => cursor.classList.add('active'));
+  document.addEventListener('mousedown', e => { cursor.classList.add('clicking'); createRipple(e.clientX, e.clientY); });
+  document.addEventListener('mouseup',   () => cursor.classList.remove('clicking'));
 }
 
 function createRipple(x, y) {
   const ripple = document.createElement('div');
-  ripple.className = 'ripple';
+  ripple.className  = 'ripple';
   ripple.style.left = x + 'px';
-  ripple.style.top = y + 'px';
+  ripple.style.top  = y + 'px';
   document.body.appendChild(ripple);
   setTimeout(() => ripple.remove(), 800);
 }
 
-function createDistortion(x, y) {
-  const canvas = document.createElement('canvas');
-  canvas.className = 'distortion-canvas';
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  document.body.appendChild(canvas);
-  
-  const ctx = canvas.getContext('2d');
-  let frame = 0;
-  const maxFrames = 20;
-  canvas.style.opacity = '0.3';
-  
-  function animate() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const progress = frame / maxFrames;
-    const radius = 60 * progress;
-    const strength = (1 - progress) * 8;
-    for (let angle = 0; angle < Math.PI * 2; angle += 0.2) {
-      const waveOffset = Math.sin(angle * 8 + frame * 0.5) * strength * 0.2;
-      const distance = Math.max(0, radius + waveOffset);
-      ctx.strokeStyle = `rgba(125, 211, 252, ${(1 - progress) * 0.2})`;
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.arc(x, y, distance, angle, angle + 0.2);
-      ctx.stroke();
-    }
-    frame++;
-    if (frame < maxFrames) {
-      requestAnimationFrame(animate);
-    } else {
-      canvas.style.opacity = '0';
-      setTimeout(() => canvas.remove(), 300);
-    }
-  }
-  animate();
-}
-
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
-    initCustomCursor();
-    initNavbarHeightTracking();
-  });
-} else {
-  initCustomCursor();
-  initNavbarHeightTracking();
-}
 function initNavbarHeightTracking() {
-  const navbar  = document.querySelector('.navbar');
-  const mainEl  = document.querySelector('main.wrap');
+  const navbar = document.querySelector('.navbar');
+  const mainEl = document.querySelector('main.wrap');
   if (!navbar || !mainEl) return;
 
   function updatePadding() {
-    const h = navbar.getBoundingClientRect().height;
-    mainEl.style.paddingTop = h + 'px';
+    mainEl.style.paddingTop = navbar.getBoundingClientRect().height + 'px';
   }
 
   updatePadding();
-
-  // Re-measure whenever the navbar might reflow (resize, font load, etc.)
   window.addEventListener('resize', updatePadding);
-
-  // Use ResizeObserver if available for pixel-perfect tracking
   if (typeof ResizeObserver !== 'undefined') {
     new ResizeObserver(updatePadding).observe(navbar);
   }
 }
 
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => { initCustomCursor(); initNavbarHeightTracking(); });
+} else {
+  initCustomCursor();
+  initNavbarHeightTracking();
+}
 
 async function showSection(target) {
-  const sections = main.querySelectorAll('section');
-  sections.forEach(s => s.hidden = true);
+  main.querySelectorAll('section').forEach(s => s.hidden = true);
 
   const sectionId = target.split('/').pop();
-  const section = document.getElementById(sectionId);
+  const section   = document.getElementById(sectionId);
   if (!section) return;
 
   section.hidden = false;
@@ -136,8 +73,8 @@ async function showSection(target) {
     const res = await fetch(`pages/${sectionId}.html`);
     if (!res.ok) throw new Error('Page not found');
     section.innerHTML = await res.text();
-  } catch (err) {
-    section.innerHTML = `<p>\u26A0\uFE0F Failed to load ${sectionId}.html</p>`;
+  } catch {
+    section.innerHTML = `<p>⚠️ Failed to load ${sectionId}.html</p>`;
   }
 
   if (sectionId === 'home')       setTimeout(() => initHome(), 0);
@@ -160,11 +97,10 @@ const initialPage = window.location.hash.substring(1) || 'pages/home';
 showSection(initialPage);
 
 setTimeout(() => {
+  const current = document.querySelector('section:not([hidden])');
   links.forEach(l => {
     l.classList.remove('active');
-    const linkHref = l.getAttribute('href').substring(1);
-    const currentSection = document.querySelector('section:not([hidden])');
-    if (currentSection && linkHref === `pages/${currentSection.id}`) {
+    if (current && l.getAttribute('href').substring(1) === `pages/${current.id}`) {
       l.classList.add('active');
     }
   });
