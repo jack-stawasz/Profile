@@ -1,13 +1,9 @@
 /* ═══════════════════════════════════════════════════════════
-   sidebar.js — Seasonal decorative sidebars
-   Pure CSS animations, no external libraries.
-   Runs once on DOMContentLoaded.
 ═══════════════════════════════════════════════════════════ */
 
 (function () {
   'use strict';
 
-  // ── Helpers ───────────────────────────────────────────────
   function rand(min, max) {
     return Math.random() * (max - min) + min;
   }
@@ -18,7 +14,6 @@
     return arr[Math.floor(Math.random() * arr.length)];
   }
 
-  // ── Detect season from current month ─────────────────────
   function getSeason() {
     const m = new Date().getMonth() + 1; // 1–12
     if (m <= 2)  return 'snow';   // Jan/Feb
@@ -29,7 +24,6 @@
     return 'xmas';                // Nov/Dec
   }
 
-  // ── Create both sidebars ──────────────────────────────────
   function createSidebars() {
     const season = getSeason();
 
@@ -42,10 +36,8 @@
     });
   }
 
-  // ── Season populators ─────────────────────────────────────
   const populate = {
 
-    // ── JAN / FEB: Snow ──────────────────────────────────
     snow(bar) {
       const count = 18;
       // Inject a shared <style> block for all unique flake keyframes
@@ -85,7 +77,6 @@
       document.head.appendChild(styleEl);
     },
 
-    // ── MAR / APR: Rain ──────────────────────────────────
     rain(bar) {
       const styleEl = document.createElement('style');
       let keyframesCSS = '';
@@ -134,7 +125,6 @@
       document.head.appendChild(styleEl);
     },
 
-    // ── MAY / JUN: Sun ───────────────────────────────────
     sun(bar, side) {
       // One large glow blob in the top corner
       const glow = document.createElement('div');
@@ -188,7 +178,6 @@
       }
     },
 
-    // ── JUL / AUG: Waves ─────────────────────────────────
     wave(bar) {
       const wavePositions = [
         { pct: 30, dur: 3.2, delay: 0.0, height: 14 },
@@ -228,7 +217,6 @@
       }
     },
 
-    // ── SEP / OCT: Bookshelves ────────────────────────────
     books(bar) {
       const bookColors = [
         'rgba(180,60,40,0.6)',   // red
@@ -298,7 +286,6 @@
       }
     },
 
-    // ── NOV / DEC: Festive Trees ──────────────────────────
     xmas(bar, side) {
       const lightColors = [
         'rgba(255,80,80,0.9)',
@@ -422,7 +409,6 @@
     },
   };
 
-  // ── Init ──────────────────────────────────────────────────
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', createSidebars);
   } else {

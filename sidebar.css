@@ -1,9 +1,3 @@
-/* ═══════════════════════════════════════════════════════════
-   sidebar.css — Seasonal decorative sidebars
-   Fixed strips on viewport left/right, pointer-events: none.
-   Hidden below 1200px where no room exists outside content.
-═══════════════════════════════════════════════════════════ */
-
 .seasonal-sidebar {
   position: fixed;
   top: 0;
@@ -12,26 +6,18 @@
   overflow: visible;
   pointer-events: none;
   z-index: 5;
-  /* Only show when viewport is wide enough that sidebars don't overlap content */
 }
 
 .seasonal-sidebar.sidebar-left  { left: 0; }
 .seasonal-sidebar.sidebar-right { right: 0; }
 
-/* Hide on viewports where sidebars would crowd the content */
 @media (max-width: 1200px) {
   .seasonal-sidebar { display: none; }
 }
 
-/* Slightly wider sidebars on very large screens */
 @media (min-width: 1600px) {
   .seasonal-sidebar { width: 110px; }
 }
-
-
-/* ════════════════════════════════════════════════════════════
-   JAN / FEB — Falling Snow
-════════════════════════════════════════════════════════════ */
 
 .season-snow .snowflake {
   position: absolute;
@@ -39,7 +25,6 @@
   border-radius: 50%;
   background: rgba(220, 240, 255, 0.75);
   box-shadow: 0 0 4px rgba(200, 230, 255, 0.5);
-  /* animation set entirely by JS per-flake */
   will-change: transform, opacity;
 }
 
@@ -50,29 +35,22 @@
   100% { opacity: 0; }
 }
 
-
-/* ════════════════════════════════════════════════════════════
-   MAR / APR — Falling Rain
-════════════════════════════════════════════════════════════ */
-
 .season-rain .raindrop {
   position: absolute;
   top: -30px;
   width: 1.5px;
   border-radius: 0 0 2px 2px;
   background: linear-gradient(to bottom, transparent, rgba(147, 210, 255, 0.55));
-  animation: rainFall linear infinite;
   will-change: transform, opacity;
 }
 
 @keyframes rainFall {
-  0%   { transform: translateY(0) skewX(-8deg);       opacity: 0; }
+  0%   { transform: translateY(0) skewX(-8deg);     opacity: 0; }
   8%   { opacity: 1; }
   92%  { opacity: 0.6; }
-  100% { transform: translateY(110vh) skewX(-8deg);   opacity: 0; }
+  100% { transform: translateY(110vh) skewX(-8deg); opacity: 0; }
 }
 
-/* Occasional splash at bottom */
 .season-rain .splash {
   position: absolute;
   bottom: 0;
@@ -90,22 +68,13 @@
   100% { transform: scale(2.5); opacity: 0; }
 }
 
-
-/* ════════════════════════════════════════════════════════════
-   MAY / JUN — Glowing Sunshine
-════════════════════════════════════════════════════════════ */
-
 .season-sun .sunbeam {
   position: absolute;
   top: 0;
   transform-origin: top center;
   width: 2px;
-  background: linear-gradient(to bottom,
-    rgba(255, 220, 80, 0.55),
-    rgba(255, 200, 50, 0.18),
-    transparent);
+  background: linear-gradient(to bottom, rgba(255, 220, 80, 0.55), rgba(255, 200, 50, 0.18), transparent);
   border-radius: 0 0 2px 2px;
-  /* rotation set inline by JS, only opacity/scale animated */
   will-change: opacity, transform;
 }
 
@@ -124,7 +93,7 @@
 }
 
 @keyframes sunGlowPulse {
-  0%   { transform: scale(0.9); opacity: 0.5; }
+  0%   { transform: scale(0.9);  opacity: 0.5; }
   100% { transform: scale(1.15); opacity: 0.85; }
 }
 
@@ -144,30 +113,23 @@
   50%       { opacity: 0.9; transform: scale(1.2); }
 }
 
-
-/* ════════════════════════════════════════════════════════════
-   JUL / AUG — Crashing Waves
-════════════════════════════════════════════════════════════ */
-
 .season-wave .wave-band {
   position: absolute;
   left: -20%;
   right: -20%;
   height: 18px;
   border-radius: 50% 50% 0 0 / 8px 8px 0 0;
-  background: linear-gradient(to bottom,
-    rgba(56, 189, 248, 0.35),
-    rgba(56, 189, 248, 0.05));
+  background: linear-gradient(to bottom, rgba(56, 189, 248, 0.35), rgba(56, 189, 248, 0.05));
   animation: waveCrash ease-in-out infinite;
   will-change: transform, opacity;
 }
 
 @keyframes waveCrash {
-  0%   { transform: translateY(0)    scaleX(1.0); opacity: 0; }
+  0%   { transform: translateY(0)    scaleX(1.0);  opacity: 0; }
   10%  { opacity: 0.8; }
   60%  { transform: translateY(6px)  scaleX(1.08); opacity: 0.5; }
   85%  { transform: translateY(10px) scaleX(0.97); opacity: 0.3; }
-  100% { transform: translateY(14px) scaleX(1.0); opacity: 0; }
+  100% { transform: translateY(14px) scaleX(1.0);  opacity: 0; }
 }
 
 .season-wave .foam-dot {
@@ -179,16 +141,11 @@
 }
 
 @keyframes foamFloat {
-  0%   { transform: translateY(0)   scale(1);    opacity: 0; }
+  0%   { transform: translateY(0)    scale(1);   opacity: 0; }
   20%  { opacity: 0.7; }
-  80%  { transform: translateY(-8px) scale(1.3); opacity: 0.2; }
+  80%  { transform: translateY(-8px)  scale(1.3); opacity: 0.2; }
   100% { transform: translateY(-14px) scale(0.8); opacity: 0; }
 }
-
-
-/* ════════════════════════════════════════════════════════════
-   SEP / OCT — Moving Bookshelves
-════════════════════════════════════════════════════════════ */
 
 .season-books .shelf-row {
   position: absolute;
@@ -222,7 +179,6 @@
   100% { transform: rotate(2deg) translateY(-1px); }
 }
 
-/* Floating page/leaf effect */
 .season-books .page {
   position: absolute;
   width: 7px;
@@ -235,17 +191,12 @@
 }
 
 @keyframes pageFloat {
-  0%   { transform: translateY(0)    rotate(0deg)   translateX(0);   opacity: 0; }
+  0%   { transform: translateY(0)    rotate(0deg)   translateX(0);    opacity: 0; }
   10%  { opacity: 0.7; }
-  50%  { transform: translateY(-35px) rotate(25deg) translateX(5px); }
+  50%  { transform: translateY(-35px) rotate(25deg)  translateX(5px); }
   90%  { opacity: 0.4; }
   100% { transform: translateY(-75px) rotate(-15deg) translateX(-4px); opacity: 0; }
 }
-
-
-/* ════════════════════════════════════════════════════════════
-   NOV / DEC — Festive Trees
-════════════════════════════════════════════════════════════ */
 
 .season-xmas .tree {
   position: absolute;
@@ -259,7 +210,6 @@
   100% { transform: rotate(1.5deg); }
 }
 
-/* Tree layers built purely in CSS */
 .season-xmas .tree-layer {
   position: absolute;
   left: 50%;
@@ -277,7 +227,6 @@
   border-radius: 1px;
 }
 
-/* Twinkling ornament lights on each tree */
 .season-xmas .light {
   position: absolute;
   width: 4px;
@@ -289,10 +238,9 @@
 
 @keyframes lightTwinkle {
   0%, 100% { opacity: 0.2; box-shadow: none; }
-  50%       { opacity: 1;   box-shadow: 0 0 5px 2px var(--light-color); }
+  50%       { opacity: 1; }
 }
 
-/* Star on top */
 .season-xmas .star {
   position: absolute;
   left: 50%;
@@ -310,12 +258,10 @@
   100% { opacity: 1.0; text-shadow: 0 0 10px rgba(255, 220, 40, 0.9), 0 0 20px rgba(255, 200, 20, 0.4); }
 }
 
-/* Falling snow over trees */
 .season-xmas .xmas-snow {
   position: absolute;
   top: -10px;
   border-radius: 50%;
   background: rgba(220, 240, 255, 0.7);
-  animation: snowFall linear infinite;
   will-change: transform, opacity;
 }
