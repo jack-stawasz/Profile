@@ -369,6 +369,10 @@ select.exp-search:invalid          { color: var(--muted); }
   flex-direction: column;
   gap: 12px;
   padding: 0 2rem;
+  max-width: 860px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
 }
 
 .project-card {
@@ -496,6 +500,10 @@ select.exp-search:invalid          { color: var(--muted); }
   flex-direction: column;
   gap: 12px;
   padding: 0 2rem;
+  max-width: 860px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
 }
 
 .exp-edu-content.list-view { gap: 0; }
