@@ -27,7 +27,7 @@ async function initHome() {
   
   initTextRotation();
   initSkillsCarousel();
-  initResearchCard();
+  initParticleCards();
   initTestimonials();
 
   const canvas = document.getElementById("fourierCanvas");
@@ -584,7 +584,6 @@ function initSkillsCarousel() {
   function updateCarouselWidth() {
     const viewportWidth = window.innerWidth;
     
-    // Determine slides per view based on viewport
     if (viewportWidth >= 1200) {
       slidesPerView = 3;
     } else if (viewportWidth >= 768) {
@@ -593,7 +592,14 @@ function initSkillsCarousel() {
       slidesPerView = 1;
     }
     
-    slideWidth = viewportWidth / slidesPerView;
+    // Measure actual slide width from DOM (accounts for gap/padding)
+    const firstSlide = track.querySelector('.skill-slide');
+    if (firstSlide) {
+      const gap = 6;
+      slideWidth = firstSlide.getBoundingClientRect().width + gap;
+    } else {
+      slideWidth = viewportWidth / slidesPerView;
+    }
   }
   
   function createSlide(skill) {
@@ -603,7 +609,6 @@ function initSkillsCarousel() {
     const imageName = skill.name.toLowerCase().replace(/\s+/g, '_').replace(/\//g, '_');
     const imagePath = `data/skills/${imageName}.png`;
     
-    // Use loading="lazy" for images and simpler fallback
     slide.innerHTML = `
       <img src="${imagePath}" alt="${skill.name}" class="skill-image" loading="lazy" onerror="this.remove()">
       <div class="skill-icon-large">${skill.icon}</div>
@@ -664,6 +669,9 @@ function initSkillsCarousel() {
     // Clear track and append fragment in one operation
     track.innerHTML = '';
     track.appendChild(fragment);
+    
+    // Re-measure now that slides are in the DOM (accounts for gap/padding)
+    updateCarouselWidth();
     
     // Set initial position without transition
     track.style.transition = 'none';
@@ -730,18 +738,16 @@ function initSkillsCarousel() {
   
   // Event listeners
   prevBtn.addEventListener('click', () => {
-    if (isTransitioning) return;
-    isTransitioning = true;
     currentSlide--;
     updateCarousel();
+    if (transitionTimeout) clearTimeout(transitionTimeout);
     transitionTimeout = setTimeout(finishTransition, 600);
   });
   
   nextBtn.addEventListener('click', () => {
-    if (isTransitioning) return;
-    isTransitioning = true;
     currentSlide++;
     updateCarousel();
+    if (transitionTimeout) clearTimeout(transitionTimeout);
     transitionTimeout = setTimeout(finishTransition, 600);
   });
   
@@ -769,16 +775,14 @@ function initSkillsCarousel() {
   // Keyboard navigation
   document.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowLeft') {
-      if (isTransitioning) return;
-      isTransitioning = true;
       currentSlide--;
       updateCarousel();
+      if (transitionTimeout) clearTimeout(transitionTimeout);
       transitionTimeout = setTimeout(finishTransition, 600);
     } else if (e.key === 'ArrowRight') {
-      if (isTransitioning) return;
-      isTransitioning = true;
       currentSlide++;
       updateCarousel();
+      if (transitionTimeout) clearTimeout(transitionTimeout);
       transitionTimeout = setTimeout(finishTransition, 600);
     }
   });
@@ -823,10 +827,26 @@ function initSkillsCarousel() {
   renderCarousel('physics');
 }
 
-function initResearchCard() {
-  const researchCard = document.querySelector('.card');
-  if (!researchCard) return;
-  
+function initParticleCards() {
+  // Particle effect on the research card
+  document.querySelectorAll('.card.particle-bg').forEach(card => {
+    attachParticles(card, card);
+  });
+
+  // Particle effect covering the whole skills card (header + carousel)
+  const skillsCard = document.querySelector('.skills-card');
+  if (skillsCard) {
+    attachParticles(skillsCard, skillsCard, '2');
+  }
+
+  // Particle effect on the testimonials section — z-index 1 so cards (default stacking) sit above it
+  const testimonialsSection = document.getElementById('testimonials-section');
+  if (testimonialsSection) {
+    attachParticles(testimonialsSection, testimonialsSection, '1');
+  }
+}
+
+function attachParticles(host, triggerEl, zIndex = '5') {
   let particles = [];
   const canvas = document.createElement('canvas');
   canvas.style.position = 'absolute';
@@ -837,22 +857,23 @@ function initResearchCard() {
   canvas.style.pointerEvents = 'none';
   canvas.style.opacity = '0';
   canvas.style.transition = 'opacity 0.3s ease';
-  researchCard.appendChild(canvas);
-  
+  canvas.style.zIndex = zIndex;
+  host.appendChild(canvas);
+
   const ctx = canvas.getContext('2d');
   let animationId = null;
-  
+
   function resize() {
-    canvas.width = researchCard.offsetWidth;
-    canvas.height = researchCard.offsetHeight;
+    canvas.width = host.offsetWidth;
+    canvas.height = host.offsetHeight;
   }
   resize();
   window.addEventListener('resize', resize);
-  
-  researchCard.addEventListener('mouseenter', () => {
+
+  triggerEl.addEventListener('mouseenter', () => {
     canvas.style.opacity = '1';
     particles = [];
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < 40; i++) {
       particles.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
@@ -861,39 +882,37 @@ function initResearchCard() {
         size: Math.random() * 2 + 1
       });
     }
-    animate();
+    if (!animationId) animate();
   });
-  
-  researchCard.addEventListener('mouseleave', () => {
+
+  triggerEl.addEventListener('mouseleave', () => {
     canvas.style.opacity = '0';
     if (animationId) {
       cancelAnimationFrame(animationId);
       animationId = null;
     }
   });
-  
+
   function animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
+
     particles.forEach(p => {
       p.x += p.vx;
       p.y += p.vy;
-      
-      if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+      if (p.x < 0 || p.x > canvas.width)  p.vx *= -1;
       if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
-      
+
       ctx.fillStyle = 'rgba(125, 211, 252, 0.6)';
       ctx.beginPath();
       ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
       ctx.fill();
     });
-    
+
     for (let i = 0; i < particles.length; i++) {
       for (let j = i + 1; j < particles.length; j++) {
         const dx = particles[i].x - particles[j].x;
         const dy = particles[i].y - particles[j].y;
         const dist = Math.sqrt(dx * dx + dy * dy);
-        
         if (dist < 100) {
           ctx.strokeStyle = `rgba(125, 211, 252, ${0.2 * (1 - dist / 100)})`;
           ctx.lineWidth = 1;
@@ -904,7 +923,7 @@ function initResearchCard() {
         }
       }
     }
-    
+
     animationId = requestAnimationFrame(animate);
   }
 }

@@ -107,7 +107,6 @@
 }
 
 .card:hover {
-  transform: translateY(-8px);
   box-shadow: 0 12px 28px var(--overlay);
   border-color: var(--accent-ring);
 }
@@ -169,7 +168,6 @@
   color: var(--accent);
   position: relative;
   z-index: 10;
-  background: var(--container);
 }
 
 .category-bookmarks {
@@ -181,13 +179,12 @@
   flex-wrap: wrap;
   position: relative;
   z-index: 10;
-  background: var(--container);
 }
 
 .category-bookmark {
   padding: 0.5rem 1rem;
   border-radius: 20px;
-  background: var(--container);
+  background: transparent;
   color: var(--muted);
   border: 2px solid transparent;
   cursor: pointer;
@@ -214,6 +211,9 @@
   height: 100%;
   width: fit-content;
   transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  gap: 6px;
+  padding: 6px;
+  box-sizing: border-box;
 }
 
 .skill-slide {
@@ -229,6 +229,14 @@
   overflow: hidden;
   flex-shrink: 0;
   box-sizing: border-box;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  transition: border-color 0.3s ease, background 0.3s ease;
+}
+
+.skill-slide:hover {
+  border-color: var(--accent-dim);
+  background: rgba(125,211,252,0.03);
 }
 
 @media (min-width: 768px)  { .skill-slide { width: 50vw; } }
@@ -350,6 +358,14 @@
   border-bottom: 1px solid var(--accent-dim);
   padding: 2rem 0 1.5rem;
   box-shadow: 0 6px 16px var(--overlay);
+  overflow: hidden;
+  transition: border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+.testimonials-section:hover {
+  border-top-color: var(--accent-ring);
+  border-bottom-color: var(--accent-ring);
+  box-shadow: 0 12px 28px var(--overlay), 0 0 0 1px var(--accent-ring);
 }
 
 .testimonials-header {
@@ -358,6 +374,8 @@
   justify-content: center;
   gap: 0.75rem;
   margin-bottom: 1.5rem;
+  position: relative;
+  z-index: 2;
 }
 
 .testimonials-header h2 {
@@ -372,10 +390,12 @@
   overflow: hidden;
   mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
   -webkit-mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
+  z-index: 2;
 }
 
 .testimonials-track {
   display: flex;
+  align-items: center;
   gap: 1.25rem;
   padding: 0.5rem 2rem;
   will-change: transform;
@@ -505,6 +525,8 @@
   padding: 0.75rem 2rem 0.25rem;
   max-width: 600px;
   margin: 0 auto;
+  position: relative;
+  z-index: 2;
 }
 
 .testimonials-pause-btn {
