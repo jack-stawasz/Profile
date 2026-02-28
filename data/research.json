@@ -1,0 +1,12 @@
+[
+  {
+    "title": "Sample Research Project",
+    "description": "A description of your research project. Add your actual research items here.",
+    "organization": "Your University",
+    "field": "Computer Science",
+    "year": 2024,
+    "tags": ["machine learning", "data analysis"],
+    "url": "",
+    "repo": ""
+  }
+]
