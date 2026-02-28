@@ -1,9 +1,13 @@
 const links = document.querySelectorAll('.nav-links a');
 const main  = document.getElementById('main-content');
 
+const isTouch = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+
 let cursor, cursorDot;
 
 function initCustomCursor() {
+  if (isTouch) return;
+
   cursor    = document.createElement('div');
   cursorDot = document.createElement('div');
   cursor.className    = 'custom-cursor';
@@ -26,6 +30,14 @@ function initCustomCursor() {
   document.addEventListener('mouseenter', () => cursor.classList.add('active'));
   document.addEventListener('mousedown', e => { cursor.classList.add('clicking'); createRipple(e.clientX, e.clientY); });
   document.addEventListener('mouseup',   () => cursor.classList.remove('clicking'));
+}
+
+function initTouchRipple() {
+  if (!isTouch) return;
+  document.addEventListener('touchstart', e => {
+    const t = e.touches[0];
+    createRipple(t.clientX, t.clientY);
+  }, { passive: true });
 }
 
 function createRipple(x, y) {
@@ -54,9 +66,14 @@ function initNavbarHeightTracking() {
 }
 
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => { initCustomCursor(); initNavbarHeightTracking(); });
+  document.addEventListener('DOMContentLoaded', () => {
+    initCustomCursor();
+    initTouchRipple();
+    initNavbarHeightTracking();
+  });
 } else {
   initCustomCursor();
+  initTouchRipple();
   initNavbarHeightTracking();
 }
 
