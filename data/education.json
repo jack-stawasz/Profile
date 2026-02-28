@@ -12,35 +12,40 @@
       "title": "Experimental Atomic Lab",
       "discipline": "Physics",
       "semester": "Fall 2024",
-      "description": "Experiments in atomic spectroscopy, interferometry, and blackbody radiation."
+      "description": "Experiments in atomic spectroscopy, interferometry, and blackbody radiation.",
+      "repo": "https://github.com/JackStawasz/LaTeX-Collections/tree/main/PHYS%20251)%20Experimental%20Atomic%20Physics"
     },
     {
       "number": "PHYS 252",
       "title": "Electronics Lab",
       "discipline": "Physics",
       "semester": "Spring 2025",
-      "description": "Circuit theory, design, simulation, debugging, and application using passive and active components."
+      "description": "Circuit theory, design, simulation, debugging, and application using passive and active components.",
+      "repo": "https://github.com/JackStawasz/LaTeX-Collections/tree/main/PHYS%20252)%20Electronics"
     },
     {
       "number": "PHYS 254",
       "title": "Mathematical Physics",
       "discipline": "Physics",
       "semester": "Spring 2024",
-      "description": "Complex analysis, series solutions of differential equations, and partial differential equations."
+      "description": "Complex analysis, series solutions of differential equations, and partial differential equations.",
+      "repo": "https://github.com/JackStawasz/LaTeX-Collections/tree/main/PHYS%20254)%20Mathematical%20Physics"
     },
     {
       "number": "PHYS 208",
       "title": "Classical Mechanics I",
       "discipline": "Physics",
       "semester": "Spring 2024",
-      "description": "The simple harmonic oscillator, coupled oscillations and normal modes, variational methods, Lagrangian and Hamiltonian mechanics, central forces."
+      "description": "The simple harmonic oscillator, coupled oscillations and normal modes, variational methods, Lagrangian and Hamiltonian mechanics, central forces.",
+      "repo": "https://github.com/JackStawasz/LaTeX-Collections/tree/main/PHYS%20208)%20Classical%20Mechanics%20I"
     },
     {
       "number": "PHYS 303",
       "title": "Classical Mechanics II",
       "discipline": "Physics",
       "semester": "Fall 2025",
-      "description": "Scattering, rigid body rotation, inertia tensor, noninertial frames, continuum mechanics, special relativity, nonlinear dynamics and chaos."
+      "description": "Scattering, rigid body rotation, inertia tensor, noninertial frames, continuum mechanics, special relativity, nonlinear dynamics and chaos.",
+      "repo": "https://github.com/JackStawasz/LaTeX-Collections/tree/main/PHYS%20303)%20Classical%20Mechanics%20II"
     },
     {
       "number": "PHYS 352",
@@ -82,7 +87,8 @@
       "title": "Thermodynamics & Statistical Mechanics",
       "discipline": "Physics",
       "semester": "Fall 2025",
-      "description": "Quantum and thermal statistical mechanics applied to gases, solids, and radiation."
+      "description": "Quantum and thermal statistical mechanics applied to gases, solids, and radiation.",
+      "repo": "https://github.com/JackStawasz/LaTeX-Collections/tree/main/PHYS%20403)%20Statistical%20Mechanics%20%26%20Thermodynamics"
     },
     {
       "number": "CSCI 241",
@@ -96,7 +102,8 @@
       "title": "Discrete Structures",
       "discipline": "Computer Science",
       "semester": "Spring 2024",
-      "description": "Sets, functions, boolean algebra, first order predicate calculus, trees, graphs and discrete probability."
+      "description": "Sets, functions, boolean algebra, first order predicate calculus, trees, graphs and discrete probability.",
+      "repo": "https://github.com/JackStawasz/LaTeX-Collections/tree/main/CSCI%20243)%20Discrete%20Structures"
     },
     {
       "number": "CSCI 301",
@@ -110,56 +117,64 @@
       "title": "Algorithms",
       "discipline": "Computer Science",
       "semester": "Fall 2024",
-      "description": "Algorithm design, complexity analysis, and NP-complete problems such as sorting and hashing."
+      "description": "Algorithm design, complexity analysis, and NP-complete problems such as sorting and hashing.",
+      "repo": "https://github.com/JackStawasz/LaTeX-Collections/tree/main/CSCI%20303)%20Algorithms"
     },
     {
       "number": "CSCI 304",
       "title": "Computer Organization",
       "discipline": "Computer Science",
       "semester": "Fall 2025",
-      "description": "Assembly instructions, binary formatting, and hardware layouts."
+      "description": "Assembly instructions, binary formatting, and hardware layouts.",
+      "repo": "https://github.com/JackStawasz/LaTeX-Collections/tree/main/CSCI%20304)%20Computer%20Organization"
     },
     {
       "number": "CSCI 312",
       "title": "Programming Languages",
       "discipline": "Computer Science",
       "semester": "Spring 2025",
-      "description": "Programming paradigms and syntax for memory management, parameter passing, and event handling"
+      "description": "Programming paradigms and syntax for memory management, parameter passing, and event handling.",
+      "repo": "https://github.com/JackStawasz/LaTeX-Collections/tree/main/CSCI%20312)%20Principles%20of%20Programming%20Languages"
     },
     {
       "number": "CSCI 416",
       "title": "Fundamentals of AI/ML",
       "discipline": "Computer Science",
       "semester": "Fall 2025",
-      "description": "Core artificial intelligence and machine learning algorithms and their use cases."
+      "description": "Core artificial intelligence and machine learning algorithms and their use cases.",
+      "repo": "https://github.com/JackStawasz/LaTeX-Collections/tree/main/CSCI%20416)%20AI%20%26%20Machine%20Learning"
     },
     {
       "number": "CSCI 420",
       "title": "Quantum Computing",
       "discipline": "Computer Science",
       "semester": "Fall 2025",
-      "description": "Qubit superposition, algorithms, and quantum protocols for computing and fault tolerance."
+      "description": "Qubit superposition, algorithms, and quantum protocols for computing and fault tolerance.",
+      "repo": "https://github.com/JackStawasz/LaTeX-Collections/tree/main/CSCI%20420)%20Quantum%20Computing"
     },
     {
       "number": "MATH 150",
       "title": "Data Driven Decision Making",
       "discipline": "Mathematics",
       "semester": "Spring 2024",
-      "description": "Data analysis, visualization, and statistical inference in R."
+      "description": "Data analysis, visualization, and statistical inference in R.",
+      "repo": "https://github.com/JackStawasz/LaTeX-Collections/tree/main/MATH%20150)%20Data-Driven%20Decision%20Making"
     },
     {
       "number": "PHYS 313",
       "title": "Quantum Mechanics I",
       "discipline": "Physics",
       "semester": "Fall 2024",
-      "description": "Non-relativistic solutions of the Schrodinger equation in one and three dimensions, symmetry, identical particles."
+      "description": "Non-relativistic solutions of the Schrodinger equation in one and three dimensions, symmetry, identical particles.",
+      "repo": "https://github.com/JackStawasz/LaTeX-Collections/tree/main/PHYS%20313)%20Quantum%20Mechanics%20I"
     },
     {
       "number": "PHYS 314",
       "title": "Quantum Mechanics II",
       "discipline": "Physics",
       "semester": "Spring 2025",
-      "description": "Perturbation theory, approximate methods, and applications of quantum mechanics for atomic, solid state and nuclear physics."
+      "description": "Perturbation theory, approximate methods, and applications of quantum mechanics for atomic, solid state and nuclear physics.",
+      "repo": "https://github.com/JackStawasz/LaTeX-Collections/tree/main/PHYS%20314)%20Quantum%20Mechanics%20II"
     }
   ],
   "Pre-Matriculation": [
