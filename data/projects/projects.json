@@ -42,7 +42,7 @@
     "title": "Address Hash Table",
     "description": "Implementation of a hash table with collision resolution via chaining.",
     "tags": ["data-structures", "c++"],
-    "repo": "https://github.com/JackStawasz/WM-Code/tree/main/unsorted/hashing",
+    "repo": "https://github.com/JackStawasz/WM-Code/tree/main/hashing",
     "thumbnail": "data/projects/hash_addresses.png",
     "organization": "W&M Computer Science"
   },

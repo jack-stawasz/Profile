@@ -159,11 +159,16 @@ function makeDragAndDrop(containerId, onReorder) {
       
       
       requestAnimationFrame(() => {
-        chip.classList.add('dragging');
+        chip.style.visibility = 'hidden';
+        chip.style.position = 'absolute';
+        chip.style.pointerEvents = 'none';
       });
     });
 
     chip.addEventListener('dragend', () => {
+      chip.style.visibility = '';
+      chip.style.position = '';
+      chip.style.pointerEvents = '';
       chip.classList.remove('dragging');
       if (placeholder && placeholder.parentNode) {
         placeholder.parentNode.removeChild(placeholder);
