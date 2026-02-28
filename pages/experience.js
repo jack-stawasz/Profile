@@ -352,30 +352,6 @@ function initProjectsPanel() {
       inner.textContent = p.title || 'Untitled';
       el.appendChild(inner);
 
-      if (p.url || p.repo) {
-        const links = document.createElement('div');
-        links.className = 'project-links';
-        links.style.display = 'inline-flex';
-        links.style.marginLeft = '10px';
-        if (p.url) {
-          const a = document.createElement('a');
-          a.href = '#';
-          a.className = 'project-link';
-          a.textContent = '🔗 View';
-          a.addEventListener('click', e => { e.preventDefault(); openPopup(p.url); });
-          links.appendChild(a);
-        }
-        if (p.repo) {
-          const a = document.createElement('a');
-          a.href = p.repo;
-          a.className = 'project-link';
-          a.textContent = '📦 Repo';
-          a.addEventListener('click', e => { e.preventDefault(); window.open(p.repo, '_blank', 'noopener,noreferrer'); });
-          links.appendChild(a);
-        }
-        el.appendChild(links);
-      }
-
       listEl.appendChild(el);
     });
   }
@@ -549,7 +525,6 @@ function initProjectsPanel() {
     document.querySelectorAll('#proj-filter-drop input[type="checkbox"]:checked').forEach(cb => {
       if (cb.dataset.type === 'org') projFilters.organizations.add(cb.value);
     });
-    filterDrop.hidden = true;
     updateDisplay();
   });
 
@@ -700,22 +675,14 @@ function initEducationPanel() {
       el.dataset.number = (c.number || '').toLowerCase();
       el.dataset.discipline = c.discipline || '';
       el.dataset.institution = c.institution || '';
+      el.dataset.description = (c.description || '').toLowerCase();
+      el.dataset.tags = (c.tags || []).join(' ').toLowerCase();
 
       const inner = document.createElement('span');
       inner.innerHTML = c.number
         ? `<span class="course-list-number">${c.number}</span>${c.title}`
         : c.title;
       el.appendChild(inner);
-
-      if (c.repo) {
-        const a = document.createElement('a');
-        a.href = c.repo;
-        a.className = 'project-link';
-        a.textContent = '📦 View Work';
-        a.style.marginLeft = '10px';
-        a.addEventListener('click', e => { e.preventDefault(); window.open(c.repo, '_blank', 'noopener,noreferrer'); });
-        el.appendChild(a);
-      }
 
       contentEl.appendChild(el);
     });
@@ -731,6 +698,8 @@ function initEducationPanel() {
       card.dataset.number = (c.number || '').toLowerCase();
       card.dataset.discipline = c.discipline || '';
       card.dataset.institution = c.institution || '';
+      card.dataset.description = (c.description || '').toLowerCase();
+      card.dataset.tags = (c.tags || []).join(' ').toLowerCase();
 
       const badge = document.createElement('div');
       badge.className = 'institution-badge';
@@ -819,8 +788,10 @@ function initEducationPanel() {
       const num   = el.dataset.number || '';
       const disc  = (el.dataset.discipline || '').toLowerCase();
       const inst  = (el.dataset.institution || '').toLowerCase();
+      const desc  = el.dataset.description || '';
+      const tags  = el.dataset.tags || '';
 
-      const matchQ = !q || title.includes(q) || num.includes(q) || disc.includes(q) || inst.includes(q);
+      const matchQ = !q || title.includes(q) || num.includes(q) || disc.includes(q) || inst.includes(q) || desc.includes(q) || tags.includes(q);
       const matchO = eduFilters.organizations.size === 0 || eduFilters.organizations.has(el.dataset.institution);
       const matchD = eduFilters.disciplines.size === 0   || eduFilters.disciplines.has(el.dataset.discipline);
 
@@ -898,7 +869,6 @@ function initEducationPanel() {
       if (cb.dataset.type === 'org')  eduFilters.organizations.add(cb.value);
       if (cb.dataset.type === 'disc') eduFilters.disciplines.add(cb.value);
     });
-    filterDrop.hidden = true;
     updateDisplay();
   });
 
@@ -1064,29 +1034,6 @@ function initResearchPanel() {
       inner.textContent = r.title;
       el.appendChild(inner);
 
-      const links = document.createElement('div');
-      links.className = 'project-links';
-      links.style.display = 'inline-flex';
-      links.style.marginLeft = '10px';
-
-      if (r.url) {
-        const a = document.createElement('a');
-        a.href = '#';
-        a.className = 'project-link';
-        a.textContent = '🔗 View';
-        a.addEventListener('click', e => { e.preventDefault(); openPopup(r.url); });
-        links.appendChild(a);
-      }
-      if (r.repo) {
-        const a = document.createElement('a');
-        a.href = r.repo;
-        a.className = 'project-link';
-        a.textContent = '📦 Repo';
-        a.addEventListener('click', e => { e.preventDefault(); window.open(r.repo, '_blank', 'noopener,noreferrer'); });
-        links.appendChild(a);
-      }
-      if (links.children.length) el.appendChild(links);
-
       contentEl.appendChild(el);
     });
   }
@@ -1239,7 +1186,6 @@ function initResearchPanel() {
       if (cb.dataset.type === 'org')   resFilters.organizations.add(cb.value);
       if (cb.dataset.type === 'field') resFilters.fields.add(cb.value);
     });
-    filterDrop.hidden = true;
     updateDisplay();
   });
 
