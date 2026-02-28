@@ -22,20 +22,13 @@ function initCustomCursor() {
     cursor.style.top = mouseY + 'px';
     cursor.classList.add('active');
     
-    // Check if hovering over clickable element
     const target = e.target;
-    const isClickable = target.closest('a, button, input, select, .project-card, .category-bookmark, .carousel-btn, .indicator-dot, [role="button"]');
-    
-    if (isClickable) {
-      cursor.classList.add('hovering');
-    } else {
-      cursor.classList.remove('hovering');
-    }
+    const isClickable = target.closest('a, button, input, select, .project-card, .course-card, .exp-tab, .category-bookmark, .carousel-btn, .indicator-dot, [role="button"]');
+    cursor.classList.toggle('hovering', !!isClickable);
   });
   
   document.addEventListener('mouseleave', () => {
-    cursor.classList.remove('active');
-    cursor.classList.remove('hovering');
+    cursor.classList.remove('active', 'hovering');
   });
   
   document.addEventListener('mouseenter', () => {
@@ -58,7 +51,6 @@ function createRipple(x, y) {
   ripple.style.left = x + 'px';
   ripple.style.top = y + 'px';
   document.body.appendChild(ripple);
-  
   setTimeout(() => ripple.remove(), 800);
 }
 
@@ -72,27 +64,22 @@ function createDistortion(x, y) {
   const ctx = canvas.getContext('2d');
   let frame = 0;
   const maxFrames = 20;
-  
   canvas.style.opacity = '0.3';
   
   function animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
     const progress = frame / maxFrames;
     const radius = 60 * progress;
     const strength = (1 - progress) * 8;
-    
     for (let angle = 0; angle < Math.PI * 2; angle += 0.2) {
       const waveOffset = Math.sin(angle * 8 + frame * 0.5) * strength * 0.2;
       const distance = Math.max(0, radius + waveOffset);
-      
       ctx.strokeStyle = `rgba(125, 211, 252, ${(1 - progress) * 0.2})`;
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.arc(x, y, distance, angle, angle + 0.2);
       ctx.stroke();
     }
-    
     frame++;
     if (frame < maxFrames) {
       requestAnimationFrame(animate);
@@ -101,14 +88,75 @@ function createDistortion(x, y) {
       setTimeout(() => canvas.remove(), 300);
     }
   }
-  
   animate();
 }
 
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initCustomCursor);
+  document.addEventListener('DOMContentLoaded', () => {
+    initCustomCursor();
+    initNavbarHeightTracking();
+    initLogoSpinRadius();
+  });
 } else {
   initCustomCursor();
+  initNavbarHeightTracking();
+  initLogoSpinRadius();
+}
+
+/* ── Dynamic navbar height → keeps content from being covered ── */
+function initNavbarHeightTracking() {
+  const navbar  = document.querySelector('.navbar');
+  const mainEl  = document.querySelector('main.wrap');
+  if (!navbar || !mainEl) return;
+
+  function updatePadding() {
+    const h = navbar.getBoundingClientRect().height;
+    mainEl.style.paddingTop = h + 'px';
+  }
+
+  updatePadding();
+
+  // Re-measure whenever the navbar might reflow (resize, font load, etc.)
+  window.addEventListener('resize', updatePadding);
+
+  // Use ResizeObserver if available for pixel-perfect tracking
+  if (typeof ResizeObserver !== 'undefined') {
+    new ResizeObserver(updatePadding).observe(navbar);
+  }
+}
+
+/* ── Logo spin with hysteresis — enter radius 80px, exit 130px ── */
+function initLogoSpinRadius() {
+  const logo = document.querySelector('.brand-logo');
+  if (!logo) return;
+
+  const ENTER_RADIUS = 80;   // px — cursor must come this close to start spinning
+  const EXIT_RADIUS  = 130;  // px — cursor must leave this far to un-spin
+
+  let spinning = false;
+  let currentAngle = 0;      // track accumulated rotation so transition stays smooth
+
+  document.addEventListener('mousemove', e => {
+    const rect   = logo.getBoundingClientRect();
+    const cx     = rect.left + rect.width  / 2;
+    const cy     = rect.top  + rect.height / 2;
+    const dist   = Math.hypot(e.clientX - cx, e.clientY - cy);
+
+    if (!spinning && dist <= ENTER_RADIUS) {
+      spinning = true;
+      currentAngle += 360;
+      logo.style.transition = 'transform 0.7s cubic-bezier(0.4, 0, 0.2, 1), filter 0.3s ease';
+      logo.style.transform  = `rotate(${currentAngle}deg) scale(1.12)`;
+      logo.style.filter     = 'drop-shadow(0 0 14px rgba(125, 211, 252, 0.9))';
+    } else if (spinning && dist > EXIT_RADIUS) {
+      spinning = false;
+      // Snap angle to nearest 360 multiple so un-spin looks clean
+      currentAngle = Math.round(currentAngle / 360) * 360;
+      logo.style.transition = 'transform 0.7s cubic-bezier(0.4, 0, 0.2, 1), filter 0.3s ease';
+      logo.style.transform  = `rotate(${currentAngle}deg) scale(1)`;
+      logo.style.filter     = 'drop-shadow(0 0 8px rgba(125, 211, 252, 0.5))';
+    }
+  });
 }
 
 async function showSection(target) {
@@ -126,31 +174,21 @@ async function showSection(target) {
     if (!res.ok) throw new Error('Page not found');
     section.innerHTML = await res.text();
   } catch (err) {
-    section.innerHTML = `<p>⚠️ Failed to load ${sectionId}.html</p>`;
+    section.innerHTML = `<p>\u26A0\uFE0F Failed to load ${sectionId}.html</p>`;
   }
 
-  if (sectionId === 'home') setTimeout(() => initHome(), 0);
-  if (sectionId === 'projects') setTimeout(() => initProjects(), 0);
-  if (sectionId === 'contact') setTimeout(() => initContacts(), 0);
-  if (sectionId === 'education') {
-    setTimeout(() => {
-      if (typeof initEducation === 'function') {
-        initEducation();
-      }
-    }, 0);
-  }
+  if (sectionId === 'home')       setTimeout(() => initHome(), 0);
+  if (sectionId === 'experience') setTimeout(() => initExperience(), 0);
+  if (sectionId === 'contact')    setTimeout(() => initContacts(), 0);
 }
 
 links.forEach(link => {
   link.addEventListener('click', async e => {
     e.preventDefault();
-
     links.forEach(l => l.classList.remove('active'));
     link.classList.add('active');
-
     const target = link.getAttribute('href').substring(1);
     await showSection(target);
-
     window.location.hash = target;
   });
 });

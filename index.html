@@ -11,24 +11,20 @@
   d='M0 0 7 0 1.889 8.031A3 3 0 011.889 2.969L7 11 0 11 5.1105 2.969A3 3 0 015.1105 8.031L0 0'
   fill='none' stroke='%237dd3fc' stroke-width='0.5' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E">
   
-  <!-- Main/Core Styles -->
+  <!-- Styles -->
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="pages/home.css">
-  <link rel="stylesheet" href="pages/projects.css">
-  <link rel="stylesheet" href="pages/education.css">
+  <link rel="stylesheet" href="pages/experience.css">
   <link rel="stylesheet" href="pages/contact.css">
 </head>
 <body>
-  <!-- Logo SVG Definition - Single Source of Truth -->
-  <svg width="0" height="0" style="position: absolute;">
+  <!-- Logo SVG — single source of truth -->
+  <svg width="0" height="0" style="position:absolute">
     <defs>
       <symbol id="logo" viewBox="-0.5 -0.5 8 12">
-        <path d="M0 0 7 0 1.889 8.031A3 3 0 011.889 2.969L7 11 0 11 5.1105 2.969A3 3 0 015.1105 8.031L0 0" 
-              fill="none" 
-              stroke="currentColor" 
-              stroke-width="0.5" 
-              stroke-linejoin="round" 
-              stroke-linecap="round"/>
+        <path d="M0 0 7 0 1.889 8.031A3 3 0 011.889 2.969L7 11 0 11 5.1105 2.969A3 3 0 015.1105 8.031L0 0"
+              fill="none" stroke="currentColor"
+              stroke-width="0.5" stroke-linejoin="round" stroke-linecap="round"/>
       </symbol>
     </defs>
   </svg>
@@ -37,25 +33,21 @@
     <nav class="navbar">
       <div class="wrap">
         <div class="nav-left">
-          <svg class="brand-logo">
-            <use href="#logo"></use>
-          </svg>
+          <svg class="brand-logo"><use href="#logo"></use></svg>
           <span class="brand">Jack Stawasz</span>
         </div>
         <ul class="nav-links">
           <li><a href="#pages/home" class="active">Home</a></li>
-          <li><a href="#pages/projects">Projects</a></li>
-          <li><a href="#pages/education">Education</a></li>
+          <li><a href="#pages/experience">Experience</a></li>
           <li><a href="#pages/contact">Contact</a></li>
         </ul>
       </div>
     </nav>
 
     <main id="main-content">
-      <section id="home">Loading Home Page...</section>
-      <section id="projects" hidden>Loading Projects…</section>
-      <section id="education" hidden>Loading Education Page...</section>
-      <section id="contact" hidden>Loading Contact Form...</section>
+      <section id="home">Loading Home Page…</section>
+      <section id="experience" hidden>Loading Experience…</section>
+      <section id="contact"    hidden>Loading Contact…</section>
     </main>
 
     <div id="popup" class="popup hidden">
@@ -64,14 +56,13 @@
         <iframe id="popup-frame" src=""></iframe>
       </div>
     </div>
-
   </main>
 
   <footer class="site-footer">
     <div class="footer-content">
       <p>&copy; 2024 Jack Stawasz. All rights reserved.</p>
       <div class="footer-links">
-        <a href="https://github.com/JackStawasz" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://github.com/JackStawasz"                 target="_blank" rel="noopener noreferrer">GitHub</a>
         <a href="https://linkedin.com/in/jack-stawasz-785680297" target="_blank" rel="noopener noreferrer">LinkedIn</a>
         <a href="mailto:jackstawasz@live.com">Email</a>
       </div>
@@ -80,8 +71,7 @@
 
   <script src="main.js"></script>
   <script src="pages/home.js"></script>
-  <script src="pages/projects.js"></script>
-  <script src="pages/education.js"></script>
+  <script src="pages/experience.js"></script>
   <script src="pages/contact.js"></script>
 </body>
 </html>
