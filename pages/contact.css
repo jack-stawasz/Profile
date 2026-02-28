@@ -1,4 +1,3 @@
-/* Profile Card */
 .profile-card {
   max-width: 480px;
   aspect-ratio: 4/5;
@@ -9,7 +8,7 @@
   flex-direction: column;
   align-items: center;
   gap: 1.5rem;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  box-shadow: 0 8px 20px var(--overlay);
   margin: auto;
   position: relative;
 }
@@ -22,7 +21,7 @@
   height: 210px;
   color: var(--accent);
   opacity: 0.3;
-  filter: drop-shadow(0 0 6px rgba(125, 211, 252, 0.4));
+  filter: drop-shadow(0 0 6px var(--accent-ring));
   transition: all 0.3s ease;
   overflow: visible;
 }
@@ -53,17 +52,16 @@
 
 .profile-name {
   font-size: clamp(16px, 5vw, 32px);
-  color: white;
+  color: var(--text);
   margin: 0;
 }
 
 .profile-subtitle {
   font-size: 1rem;
-  color: #ccc;
+  color: var(--muted);
   margin: 0;
 }
 
-/* Social Links */
 .social-links {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -81,7 +79,7 @@
   padding: 0.5em 1em;
   border-radius: 3em;
   border: 2px solid currentColor;
-  color: #ccc;
+  color: var(--muted);
   text-decoration: none;
   transition: color 0.4s ease, border-color 0.4s ease, background-color 0.4s ease, transform 0.4s ease;
   width: 80%;
@@ -101,9 +99,7 @@
   transition: opacity 0.4s ease;
 }
 
-.social-links a:hover canvas.glow-canvas {
-  opacity: 1;
-}
+.social-links a:hover canvas.glow-canvas { opacity: 1; }
 
 .social-links a .icon {
   width: 32px;
@@ -122,7 +118,7 @@
 }
 
 .social-links a:hover {
-  color: white;
+  color: var(--text);
   border-color: transparent;
   transform: translateY(-2px);
 }
@@ -132,18 +128,14 @@
   stroke: none;
 }
 
-/* Social Platform Colors */
-.email:hover { background-color: #4c11c1; }
-.github:hover { background-color: #000000; }
-.linkedin:hover { background-color: #0077b5; }
-.youtube:hover { background-color: #FF0000; }
-.discord:hover { background-color: #5B67F1; }
+.email:hover     { background-color: #4c11c1; }
+.github:hover    { background-color: #000000; }
+.linkedin:hover  { background-color: #0077b5; }
+.youtube:hover   { background-color: #FF0000; }
+.discord:hover   { background-color: #5B67F1; }
 .instagram:hover { background-color: #e1306c; }
 
-/* Tooltip */
-.tooltip {
-  position: relative;
-}
+.tooltip { position: relative; }
 
 .tooltip::after {
   content: attr(data-tooltip);
@@ -151,7 +143,7 @@
   bottom: 120%;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(20, 20, 20, 0.95);
+  background: var(--tooltip-bg);
   color: #fff;
   padding: 6px 10px;
   border-radius: 6px;
@@ -171,7 +163,7 @@
   transform: translateX(-50%);
   border-width: 6px;
   border-style: solid;
-  border-color: rgba(20, 20, 20, 0.95) transparent transparent transparent;
+  border-color: var(--tooltip-bg) transparent transparent transparent;
   opacity: 0;
   transition: opacity 0.15s ease;
 }
