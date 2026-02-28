@@ -22,6 +22,48 @@ function closePopup() {
 closeBtn.addEventListener('click', closePopup);
 popup.addEventListener('click', e => { if (e.target === popup) closePopup(); });
 
+/* ── Panel logo spin with hysteresis (enter 70px / exit 120px) ─ */
+function initExpLogoSpin() {
+  const ENTER_RADIUS = 70;
+  const EXIT_RADIUS  = 120;
+
+  // Track each logo independently
+  const logoStates = new WeakMap();
+
+  function getState(logo) {
+    if (!logoStates.has(logo)) {
+      logoStates.set(logo, { spinning: false, angle: 0 });
+    }
+    return logoStates.get(logo);
+  }
+
+  document.addEventListener('mousemove', e => {
+    document.querySelectorAll('.exp-logo').forEach(logo => {
+      const rect  = logo.getBoundingClientRect();
+      const cx    = rect.left + rect.width  / 2;
+      const cy    = rect.top  + rect.height / 2;
+      const dist  = Math.hypot(e.clientX - cx, e.clientY - cy);
+      const state = getState(logo);
+
+      if (!state.spinning && dist <= ENTER_RADIUS) {
+        state.spinning = true;
+        state.angle   += 360;
+        logo.style.transition = 'transform 0.7s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease, filter 0.3s ease';
+        logo.style.transform  = `rotate(${state.angle}deg) scale(1.12)`;
+        logo.style.opacity    = '1';
+        logo.style.filter     = 'drop-shadow(0 0 12px rgba(125,211,252,0.85))';
+      } else if (state.spinning && dist > EXIT_RADIUS) {
+        state.spinning  = false;
+        state.angle     = Math.round(state.angle / 360) * 360;
+        logo.style.transition = 'transform 0.7s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease, filter 0.3s ease';
+        logo.style.transform  = `rotate(${state.angle}deg) scale(1)`;
+        logo.style.opacity    = '0.6';
+        logo.style.filter     = 'drop-shadow(0 0 6px rgba(125,211,252,0.4))';
+      }
+    });
+  });
+}
+
 // ── Module-level education state ────────────────────────────
 let _eduAbortController = null;
 let eduCourses      = [];
@@ -53,6 +95,9 @@ let resFilters      = { organizations: new Set(), fields: new Set() };
 
 // ═══════════════════════════════════════════════════════════
 function initExperience() {
+
+  // ── Panel logo spin (same hysteresis as navbar logo in main.js) ──
+  initExpLogoSpin();
 
   // ── Tab switching ──────────────────────────────────────────
   const tabs   = document.querySelectorAll('.exp-tab');
@@ -122,20 +167,30 @@ function makeDragAndDrop(containerId, onReorder) {
   function attachChip(chip) {
     chip.addEventListener('dragstart', e => {
       draggedChip = chip;
-      chip.classList.add('dragging');
       e.dataTransfer.effectAllowed = 'move';
       e.dataTransfer.setData('text/plain', chip.dataset.sort);
+
+      // Create placeholder to show where chip will land
       placeholder = document.createElement('div');
       placeholder.className = 'exp-sort-chip-placeholder';
-      placeholder.innerHTML = chip.innerHTML;
-      container.insertBefore(placeholder, chip);
-      setTimeout(() => { chip.style.opacity = '0.01'; }, 0);
+      // Match height so layout doesn't collapse
+      placeholder.style.height = chip.getBoundingClientRect().height + 'px';
+
+      // Insert placeholder after — chip stays in DOM until drop
+      chip.after(placeholder);
+
+      // Style the chip as "being dragged" WITHOUT hiding it
+      // (hiding/opacity changes break the drag image in some browsers)
+      requestAnimationFrame(() => {
+        chip.classList.add('dragging');
+      });
     });
 
     chip.addEventListener('dragend', () => {
       chip.classList.remove('dragging');
-      chip.style.opacity = '';
-      if (placeholder && placeholder.parentNode) placeholder.parentNode.removeChild(placeholder);
+      if (placeholder && placeholder.parentNode) {
+        placeholder.parentNode.removeChild(placeholder);
+      }
       placeholder = null;
       draggedChip = null;
     });
@@ -145,17 +200,33 @@ function makeDragAndDrop(containerId, onReorder) {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
     if (!draggedChip || !placeholder) return;
+
+    // Walk up from e.target to find the actual chip (handles child span clicks)
     const target = e.target.closest('.exp-sort-chip');
     if (!target || target === draggedChip) return;
-    const mid = target.getBoundingClientRect().top + target.getBoundingClientRect().height / 2;
-    container.insertBefore(placeholder, e.clientY < mid ? target : target.nextSibling);
+
+    const rect = target.getBoundingClientRect();
+    const mid  = rect.top + rect.height / 2;
+
+    if (e.clientY < mid) {
+      // Insert placeholder before target
+      if (placeholder.nextSibling !== target) {
+        container.insertBefore(placeholder, target);
+      }
+    } else {
+      // Insert placeholder after target
+      if (target.nextSibling !== placeholder) {
+        container.insertBefore(placeholder, target.nextSibling);
+      }
+    }
   });
 
   container.addEventListener('drop', e => {
     e.preventDefault();
     if (!draggedChip || !placeholder || !placeholder.parentNode) return;
+    // Replace placeholder with the real chip
     placeholder.parentNode.replaceChild(draggedChip, placeholder);
-    draggedChip.style.opacity = '';
+    draggedChip.classList.remove('dragging');
     placeholder = null;
     onReorder([...container.querySelectorAll('.exp-sort-chip')].map(c => c.dataset.sort));
   });
@@ -706,23 +777,27 @@ function initEducationPanel() {
       if (c.discipline) { const s = document.createElement('span'); s.className = 'course-tag'; s.textContent = c.discipline; tags.appendChild(s); }
       if (c.semester)   { const s = document.createElement('span'); s.className = 'course-tag'; s.textContent = c.semester;   tags.appendChild(s); }
       (c.tags || []).forEach(t => { const s = document.createElement('span'); s.className = 'course-tag'; s.textContent = t; tags.appendChild(s); });
-      if (tags.children.length) meta.appendChild(tags);
 
-      // View Work button (only if repo exists)
-      if (c.repo) {
+      // Put tags + View Work button on the same row (mirroring project-meta-row layout)
+      if (tags.children.length || c.repo) {
         const row = document.createElement('div');
         row.className = 'project-meta-row';
         row.style.marginTop = '8px';
-        const links = document.createElement('div');
-        links.className = 'project-links';
-        links.style.marginLeft = 'auto';
-        const a = document.createElement('a');
-        a.href = c.repo;
-        a.className = 'project-link';
-        a.textContent = '📦 View Work';
-        a.addEventListener('click', e => { e.preventDefault(); window.open(c.repo, '_blank', 'noopener,noreferrer'); });
-        links.appendChild(a);
-        row.appendChild(links);
+
+        if (tags.children.length) row.appendChild(tags);
+
+        if (c.repo) {
+          const links = document.createElement('div');
+          links.className = 'project-links';
+          const a = document.createElement('a');
+          a.href = c.repo;
+          a.className = 'project-link';
+          a.textContent = '📦 View Work';
+          a.addEventListener('click', ev => { ev.preventDefault(); window.open(c.repo, '_blank', 'noopener,noreferrer'); });
+          links.appendChild(a);
+          row.appendChild(links);
+        }
+
         meta.appendChild(row);
       }
 
