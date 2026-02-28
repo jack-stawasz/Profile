@@ -27,11 +27,25 @@ async function initHome() {
   
   initTextRotation();
   initSkillsCarousel();
-  initParticleCards();
+  if (!window.SiteSettings || window.SiteSettings.animationsEnabled) {
+    initParticleCards();
+  }
   initTestimonials();
 
   const canvas = document.getElementById("fourierCanvas");
   if (!canvas) return;
+
+  // Static fallback when animations are disabled
+  if (window.SiteSettings && !window.SiteSettings.animationsEnabled) {
+    const banner = document.querySelector('.fourier-banner');
+    if (banner) {
+      banner.style.background = 'linear-gradient(135deg, #000 0%, #071021 100%)';
+      canvas.style.display = 'none';
+      const staticSvg = document.querySelector('.overlay-text');
+      if (staticSvg) staticSvg.style.animation = 'none';
+    }
+    return;
+  }
   
   const ctx = canvas.getContext("2d");
   const path = document.getElementById("svgPath");

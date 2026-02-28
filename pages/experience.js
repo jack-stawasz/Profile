@@ -26,6 +26,7 @@ function initExpLogoSpin() {
   }
 
   document.addEventListener('mousemove', e => {
+    if (window.SiteSettings && !window.SiteSettings.animationsEnabled) return;
     document.querySelectorAll('.exp-logo').forEach(logo => {
       const rect  = logo.getBoundingClientRect();
       const dist  = Math.hypot(e.clientX - (rect.left + rect.width / 2), e.clientY - (rect.top + rect.height / 2));
@@ -159,16 +160,11 @@ function makeDragAndDrop(containerId, onReorder) {
       
       
       requestAnimationFrame(() => {
-        chip.style.visibility = 'hidden';
-        chip.style.position = 'absolute';
-        chip.style.pointerEvents = 'none';
+        chip.classList.add('dragging');
       });
     });
 
     chip.addEventListener('dragend', () => {
-      chip.style.visibility = '';
-      chip.style.position = '';
-      chip.style.pointerEvents = '';
       chip.classList.remove('dragging');
       if (placeholder && placeholder.parentNode) {
         placeholder.parentNode.removeChild(placeholder);

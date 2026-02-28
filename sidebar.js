@@ -14,8 +14,12 @@
     return arr[Math.floor(Math.random() * arr.length)];
   }
 
+  function getDate() {
+    return (window.SiteSettings && window.SiteSettings.getDate) ? window.SiteSettings.getDate() : new Date();
+  }
+
   function getSeason() {
-    const m = new Date().getMonth() + 1; // 1–12
+    const m = getDate().getMonth() + 1; // 1–12
     if (m <= 2)  return 'snow';   // Jan/Feb
     if (m <= 4)  return 'rain';   // Mar/Apr
     if (m <= 6)  return 'sun';    // May/Jun
@@ -25,16 +29,23 @@
   }
 
   function createSidebars() {
+    // Remove any existing sidebars
+    document.querySelectorAll('.seasonal-sidebar').forEach(el => el.remove());
+
     const season = getSeason();
+    const noAnim = window.SiteSettings && !window.SiteSettings.animationsEnabled;
 
     ['left', 'right'].forEach(side => {
       const bar = document.createElement('div');
       bar.className = `seasonal-sidebar sidebar-${side} season-${season}`;
       bar.setAttribute('aria-hidden', 'true');
-      populate[season](bar, side);
+      if (!noAnim) populate[season](bar, side);
       document.body.appendChild(bar);
     });
   }
+
+  // Expose refresh so settings panel can trigger a redraw
+  window._refreshSidebar = createSidebars;
 
   const populate = {
 

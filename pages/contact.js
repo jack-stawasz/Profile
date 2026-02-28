@@ -15,6 +15,9 @@ function initContacts() {
   });
 
   document.querySelectorAll('.social-links a').forEach(link => {
+    // Skip glow effect if animations are disabled
+    if (window.SiteSettings && !window.SiteSettings.animationsEnabled) return;
+
     const canvas = document.createElement('canvas');
     canvas.className = 'glow-canvas';
     canvas.style.position = 'absolute';

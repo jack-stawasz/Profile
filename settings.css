@@ -1,0 +1,448 @@
+/* ── Gear Button ────────────────────────────────────────────── */
+.settings-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: transparent;
+  border: 1.5px solid var(--border-strong);
+  color: var(--muted);
+  cursor: pointer;
+  margin-left: 16px;
+  transition: border-color 0.25s ease, color 0.25s ease, background 0.25s ease, transform 0.4s ease;
+  flex-shrink: 0;
+}
+
+.settings-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-dim);
+}
+
+.settings-btn.open {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-dim);
+  box-shadow: 0 0 12px var(--accent-ring);
+}
+
+.settings-btn svg {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.5s cubic-bezier(0.4,0,0.2,1);
+}
+
+.settings-btn.open svg { transform: rotate(90deg); }
+
+/* ── Overlay ────────────────────────────────────────────────── */
+.settings-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.settings-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.settings-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.3);
+  backdrop-filter: blur(0.5px);
+}
+
+/* ── Panel ──────────────────────────────────────────────────── */
+.settings-panel {
+  position: absolute;
+  top: 70px;
+  right: 24px;
+  width: 360px;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+  background: var(--container);
+  border: 1px solid var(--border-strong);
+  border-radius: 16px;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.7), 0 0 0 1px var(--accent-dim);
+  transform: translateY(-12px) scale(0.97);
+  transition: transform 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease;
+  opacity: 0;
+}
+
+.settings-overlay.open .settings-panel {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+.settings-panel::-webkit-scrollbar { width: 4px; }
+.settings-panel::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 2px; }
+
+/* ── Panel Header ───────────────────────────────────────────── */
+.settings-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.1rem 1.25rem 0.9rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.settings-panel-header h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.settings-close-btn {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 6px;
+  transition: color 0.2s ease, background 0.2s ease;
+  line-height: 1;
+}
+
+.settings-close-btn:hover {
+  color: var(--text);
+  background: var(--glass);
+}
+
+/* ── Section groups ─────────────────────────────────────────── */
+.settings-group {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.settings-group:last-child { border-bottom: none; }
+
+.settings-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 0.65rem;
+}
+
+/* ── Theme dropdown ─────────────────────────────────────────── */
+.settings-select {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border-strong);
+  background: var(--glass);
+  color: var(--text);
+  font-size: 0.9rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239aa4b2' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 34px;
+}
+
+.settings-select option { background: var(--card); color: var(--text); }
+
+.settings-select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-ring);
+}
+
+/* ── Date slider ────────────────────────────────────────────── */
+.settings-date-display {
+  font-size: 0.88rem;
+  color: var(--accent);
+  text-align: center;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.settings-slider {
+  width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+  background: linear-gradient(
+    to right,
+    var(--accent-mid) 0%,
+    var(--accent-mid) var(--slider-pct, 0%),
+    rgba(255,255,255,0.1) var(--slider-pct, 0%),
+    rgba(255,255,255,0.1) 100%
+  );
+  margin-bottom: 0.4rem;
+}
+
+.settings-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  box-shadow: 0 0 8px var(--accent-ring);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.settings-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.25);
+  box-shadow: 0 0 14px var(--accent-ring);
+}
+
+.settings-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 0 8px var(--accent-ring);
+}
+
+.date-slider-ticks {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.68rem;
+  color: var(--muted);
+  letter-spacing: 0.02em;
+  padding: 0 1px;
+}
+
+/* ── Font size ──────────────────────────────────────────────── */
+.settings-font-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.settings-font-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid var(--border-strong);
+  background: var(--glass);
+  color: var(--text);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s ease, background 0.2s ease;
+  flex-shrink: 0;
+}
+
+.settings-font-btn:hover {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+  color: var(--accent);
+}
+
+.settings-font-val {
+  flex: 1;
+  text-align: center;
+  font-size: 0.88rem;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.settings-font-reset {
+  font-size: 0.72rem;
+  color: var(--muted);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 3px 8px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease;
+  font-family: inherit;
+}
+
+.settings-font-reset:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ── Date today button ──────────────────────────────────────── */
+.settings-date-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.65rem;
+}
+
+.settings-today-btn {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--accent);
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-border);
+  border-radius: 5px;
+  padding: 2px 8px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s ease, border-color 0.2s ease;
+  letter-spacing: 0.04em;
+}
+
+.settings-today-btn:hover {
+  background: var(--accent-mid);
+  border-color: var(--accent);
+}
+
+/* ── 7-Segment Clock ────────────────────────────────────────── */
+.seg-clock-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.35);
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  padding: 10px 16px;
+  margin-top: 6px;
+  gap: 0;
+}
+
+.seg-clock {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  font-family: 'Courier New', monospace;
+}
+
+.seg-digit {
+  position: relative;
+  width: 22px;
+  height: 38px;
+  flex-shrink: 0;
+}
+
+.seg-digit svg {
+  width: 100%;
+  height: 100%;
+}
+
+.seg-sep {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0 2px;
+  padding-bottom: 2px;
+  align-self: center;
+}
+
+.seg-sep-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 6px var(--accent-ring);
+  animation: segBlink 1s step-end infinite;
+}
+
+@keyframes segBlink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.15; }
+}
+
+.seg-ampm {
+  font-size: 0.65rem;
+  color: var(--accent);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  align-self: flex-end;
+  padding-bottom: 4px;
+  margin-left: 4px;
+  opacity: 0.8;
+}
+
+/* ── Animation toggle ───────────────────────────────────────── */
+.settings-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.settings-toggle-label {
+  font-size: 0.88rem;
+  color: var(--text);
+}
+
+.settings-toggle {
+  position: relative;
+  width: 46px;
+  height: 26px;
+  flex-shrink: 0;
+}
+
+.settings-toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.settings-toggle-track {
+  position: absolute;
+  inset: 0;
+  border-radius: 13px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid var(--border-strong);
+  cursor: pointer;
+  transition: background 0.25s ease, border-color 0.25s ease;
+}
+
+.settings-toggle input:checked + .settings-toggle-track {
+  background: var(--accent-mid);
+  border-color: var(--accent);
+}
+
+.settings-toggle-track::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--muted);
+  transition: transform 0.25s cubic-bezier(0.4,0,0.2,1), background 0.25s ease;
+}
+
+.settings-toggle input:checked + .settings-toggle-track::after {
+  transform: translateX(20px);
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent-ring);
+}
+
+/* ── No-animation override ──────────────────────────────────── */
+body.no-animations .seasonal-sidebar * {
+  animation: none !important;
+  transition: none !important;
+}
+body.no-animations .seasonal-sidebar { opacity: 0.3; }
+
+body.no-animations .exp-logo {
+  transform: none !important;
+  transition: none !important;
+}

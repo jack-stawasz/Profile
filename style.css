@@ -283,6 +283,7 @@ main.hidden { opacity: 0; }
 .nav-right {
   display: flex;
   align-items: center;
+  gap: 0;
 }
 
 .nav-links {
