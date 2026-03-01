@@ -181,8 +181,8 @@
     function c(i) { return s[i] ? accentOn : accentOff; }
     function glow(i) { return s[i] ? `filter:drop-shadow(0 0 4px ${accentOn})` : ''; }
 
-    // Using path-based segments (thick bar style)
-    return `<svg viewBox="0 0 20 34" xmlns="http://www.w3.org/2000/svg" style="display:block">
+    // Using path-based segments (thick bar style) with padded viewBox to prevent clipping
+    return `<svg viewBox="-1.5 -1.5 23 37" xmlns="http://www.w3.org/2000/svg" style="display:block;overflow:visible">
       <!-- a top -->
       <path d="M3 2 L17 2 L15.5 3.5 L4.5 3.5 Z" fill="${c(0)}" style="${glow(0)}"/>
       <!-- b top-right -->
@@ -385,49 +385,66 @@
     fontGroup.className = 'settings-group';
     fontGroup.innerHTML = `<span class="settings-label">Font Size</span>`;
 
-    const fontRow = document.createElement('div');
-    fontRow.className = 'settings-font-row';
+    const fontSliderRow = document.createElement('div');
+    fontSliderRow.className = 'settings-font-slider-row';
 
-    const decBtn = document.createElement('button');
-    decBtn.className = 'settings-font-btn';
-    decBtn.textContent = '−';
-    decBtn.setAttribute('aria-label', 'Decrease font size');
+    const aSmall = document.createElement('span');
+    aSmall.className = 'settings-font-a-small';
+    aSmall.textContent = 'A';
+
+    const fontSliderWrap = document.createElement('div');
+    fontSliderWrap.className = 'settings-font-slider-wrap';
 
     const fontVal = document.createElement('div');
     fontVal.className = 'settings-font-val';
     fontVal.id = 'settings-font-val';
     fontVal.textContent = state.fontSize + '%';
 
-    const incBtn = document.createElement('button');
-    incBtn.className = 'settings-font-btn';
-    incBtn.textContent = '+';
-    incBtn.setAttribute('aria-label', 'Increase font size');
+    const fontSlider = document.createElement('input');
+    fontSlider.type = 'range';
+    fontSlider.min = 70;
+    fontSlider.max = 150;
+    fontSlider.step = 5;
+    fontSlider.value = state.fontSize;
+    fontSlider.className = 'settings-slider';
+    fontSlider.setAttribute('aria-label', 'Font size');
+
+    function syncFontSlider() {
+      const pct = ((fontSlider.value - 70) / 80 * 100).toFixed(1) + '%';
+      fontSlider.style.setProperty('--slider-pct', pct);
+      fontVal.textContent = fontSlider.value + '%';
+    }
+    syncFontSlider();
+
+    fontSlider.addEventListener('input', () => {
+      state.fontSize = Number(fontSlider.value);
+      save('fontSize', state.fontSize);
+      syncFontSlider();
+      applyFontSize(state.fontSize);
+    });
+
+    const aLarge = document.createElement('span');
+    aLarge.className = 'settings-font-a-large';
+    aLarge.textContent = 'A';
 
     const resetFontBtn = document.createElement('button');
     resetFontBtn.className = 'settings-font-reset';
     resetFontBtn.textContent = 'Reset';
-
-    function changeFontSize(delta) {
-      state.fontSize = Math.min(150, Math.max(70, state.fontSize + delta));
-      save('fontSize', state.fontSize);
-      fontVal.textContent = state.fontSize + '%';
-      applyFontSize(state.fontSize);
-    }
-
-    decBtn.addEventListener('click', () => changeFontSize(-5));
-    incBtn.addEventListener('click', () => changeFontSize(5));
     resetFontBtn.addEventListener('click', () => {
       state.fontSize = 100;
       save('fontSize', 100);
-      fontVal.textContent = '100%';
+      fontSlider.value = 100;
+      syncFontSlider();
       applyFontSize(100);
     });
 
-    fontRow.appendChild(decBtn);
-    fontRow.appendChild(fontVal);
-    fontRow.appendChild(incBtn);
-    fontRow.appendChild(resetFontBtn);
-    fontGroup.appendChild(fontRow);
+    fontSliderWrap.appendChild(fontVal);
+    fontSliderWrap.appendChild(fontSlider);
+    fontSliderRow.appendChild(aSmall);
+    fontSliderRow.appendChild(fontSliderWrap);
+    fontSliderRow.appendChild(aLarge);
+    fontSliderRow.appendChild(resetFontBtn);
+    fontGroup.appendChild(fontSliderRow);
     panel.appendChild(fontGroup);
 
     /* ─── Group: Clock ─── */
@@ -446,11 +463,7 @@
     animRow.className = 'settings-toggle-row';
 
     const animLabel = document.createElement('div');
-    animLabel.innerHTML = `
-      <span class="settings-toggle-label">Animations</span>
-      <div style="font-size:0.72rem;color:var(--muted);margin-top:2px;line-height:1.4">
-        Sidebar effects, signature drawing, particle backgrounds, contact glow
-      </div>`;
+    animLabel.innerHTML = `<span class="settings-toggle-label">Animations</span>`;
 
     const toggleWrap = document.createElement('label');
     toggleWrap.className = 'settings-toggle';
@@ -471,6 +484,7 @@
       state.animations = toggleInput.checked;
       save('animations', state.animations);
       applyAnimations(state.animations);
+      if (window._applyBannerState) window._applyBannerState(state.animations);
     });
 
     animRow.appendChild(animLabel);

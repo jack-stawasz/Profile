@@ -2,7 +2,7 @@
   position: fixed;
   top: 0;
   bottom: 0;
-  width: 104px;
+  width: 135px;
   overflow: visible;
   pointer-events: none;
   z-index: 5;
@@ -16,7 +16,7 @@
 }
 
 @media (min-width: 1600px) {
-  .seasonal-sidebar { width: 143px; }
+  .seasonal-sidebar { width: 186px; }
 }
 
 .season-snow .snowflake {
