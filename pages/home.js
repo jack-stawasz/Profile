@@ -35,15 +35,66 @@ async function initHome() {
   const canvas = document.getElementById("fourierCanvas");
   if (!canvas) return;
 
-  // Static fallback when animations are disabled
-  if (window.SiteSettings && !window.SiteSettings.animationsEnabled) {
-    const banner = document.querySelector('.fourier-banner');
-    if (banner) {
-      banner.style.background = 'linear-gradient(135deg, #000 0%, #071021 100%)';
-      canvas.style.display = 'none';
-      const staticSvg = document.querySelector('.overlay-text');
-      if (staticSvg) staticSvg.style.animation = 'none';
+  const banner = document.querySelector('.fourier-banner');
+  const overlayText = document.querySelector('.overlay-text');
+
+  function showStaticBanner() {
+    if (!banner) return;
+    canvas.style.display = 'none';
+    if (overlayText) overlayText.style.animation = 'none';
+    if (!banner.querySelector('.static-sig-svg')) {
+      const svgNS = 'http://www.w3.org/2000/svg';
+      const svg = document.createElementNS(svgNS, 'svg');
+      svg.setAttribute('class', 'static-sig-svg');
+      svg.setAttribute('viewBox', '-1 -6 19 12');
+      svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+      svg.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;pointer-events:none;';
+
+      const defs = document.createElementNS(svgNS, 'defs');
+      const filter = document.createElementNS(svgNS, 'filter');
+      filter.setAttribute('id', 'sig-glow');
+      filter.innerHTML = `<feGaussianBlur stdDeviation="0.18" result="blur"/>
+        <feMerge><feMergeNode in="blur"/><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>`;
+      defs.appendChild(filter);
+      svg.appendChild(defs);
+
+      const path = document.createElementNS(svgNS, 'path');
+      path.setAttribute('d', document.getElementById('svgPath')?.getAttribute('d') || '');
+      path.setAttribute('fill', 'none');
+      path.setAttribute('stroke', 'rgba(125,211,252,0.9)');
+      path.setAttribute('stroke-width', '0.18');
+      path.setAttribute('stroke-linecap', 'round');
+      path.setAttribute('stroke-linejoin', 'round');
+      path.setAttribute('filter', 'url(#sig-glow)');
+      svg.appendChild(path);
+      banner.appendChild(svg);
     }
+  }
+
+  function showAnimatedBanner() {
+    if (!banner) return;
+    canvas.style.display = '';
+    if (overlayText) overlayText.style.animation = '';
+    const staticSvg = banner.querySelector('.static-sig-svg');
+    if (staticSvg) staticSvg.remove();
+  }
+
+  window._applyBannerState = function(animsEnabled) {
+    if (animsEnabled) {
+      showAnimatedBanner();
+      if (homeAnimationController && !homeAnimationController.isRunning) {
+        homeAnimationController.isRunning = true;
+        animate();
+      }
+    } else {
+      if (homeAnimationController) homeAnimationController.stop();
+      showStaticBanner();
+    }
+  };
+
+  // Static fallback when animations are disabled on load
+  if (window.SiteSettings && !window.SiteSettings.animationsEnabled) {
+    showStaticBanner();
     return;
   }
   
