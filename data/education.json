@@ -5,6 +5,8 @@
       "title": "Modern Physics",
       "discipline": "Physics",
       "semester": "Fall 2023",
+      "textbooks": ["serway-3e"],
+      "professor": "Vahle",
       "description": "20th-century physics: introduction to relativity, quantum, and wave-particle duality theories."
     },
     {
@@ -12,6 +14,7 @@
       "title": "Experimental Atomic Lab",
       "discipline": "Physics",
       "semester": "Fall 2024",
+      "professor": "Aubin",
       "description": "Experiments in atomic spectroscopy, interferometry, and blackbody radiation.",
       "repo": "https://github.com/jack-stawasz/LaTeX-Collections/tree/main/PHYS%20251)%20Experimental%20Atomic%20Physics"
     },
@@ -20,6 +23,8 @@
       "title": "Electronics Lab",
       "discipline": "Physics",
       "semester": "Spring 2025",
+      "textbooks": ["malvino-9e"],
+      "professor": "R. Yang",
       "description": "Circuit theory, design, simulation, debugging, and application using passive and active components.",
       "repo": "https://github.com/jack-stawasz/LaTeX-Collections/tree/main/PHYS%20252)%20Electronics"
     },
@@ -28,6 +33,8 @@
       "title": "Mathematical Physics",
       "discipline": "Physics",
       "semester": "Spring 2024",
+      "textbooks": ["boas-3e"],
+      "professor": "Vahle",
       "description": "Complex analysis, series solutions of differential equations, and partial differential equations.",
       "repo": "https://github.com/jack-stawasz/LaTeX-Collections/tree/main/PHYS%20254)%20Mathematical%20Physics"
     },
@@ -36,6 +43,8 @@
       "title": "Classical Mechanics I",
       "discipline": "Physics",
       "semester": "Spring 2024",
+      "textbooks": ["taylor"],
+      "professor": "Averett",
       "description": "The simple harmonic oscillator, coupled oscillations and normal modes, variational methods, Lagrangian and Hamiltonian mechanics, central forces.",
       "repo": "https://github.com/jack-stawasz/LaTeX-Collections/tree/main/PHYS%20208)%20Classical%20Mechanics%20I"
     },
@@ -44,6 +53,8 @@
       "title": "Classical Mechanics II",
       "discipline": "Physics",
       "semester": "Fall 2025",
+      "textbooks": ["taylor"],
+      "professor": "Jackura",
       "description": "Scattering, rigid body rotation, inertia tensor, noninertial frames, continuum mechanics, special relativity, nonlinear dynamics and chaos.",
       "repo": "https://github.com/jack-stawasz/LaTeX-Collections/tree/main/PHYS%20303)%20Classical%20Mechanics%20II"
     },
@@ -52,6 +63,7 @@
       "title": "Experimental Modern Physics",
       "discipline": "Physics",
       "semester": "Spring 2026",
+      "professor": "Averett",
       "description": "Experiments in atomic, nuclear, solid state and elementary particle physics.",
       "repo": "https://github.com/jack-stawasz/LaTeX-Collections/tree/main/PHYS%20352)%20Experimental%20Modern%20Physics"
     },
@@ -60,6 +72,8 @@
       "title": "Electricity & Magnetism I",
       "discipline": "Physics",
       "semester": "Spring 2026",
+      "textbooks": ["griffiths-5e"],
+      "professor": "Stevens",
       "description": "Development of the theory of electricity and magnetism including electrostatics, magnetostatics and Maxwell’s equations.",
       "repo": "https://github.com/jack-stawasz/LaTeX-Collections/tree/main/PHYS%20401)%20Electricity%20%26%20Magnetism%20I"
     },
@@ -68,6 +82,7 @@
       "title": "Finite Automata",
       "discipline": "Computer Science",
       "semester": "Spring 2026",
+      "professor": "W. Mao",
       "description": "Theory of sequential machines, finite automata, Turing machines, recursive functions, computability of functions.",
       "repo": "https://github.com/jack-stawasz/LaTeX-Collections/tree/main/CSCI%20423)%20Finite%20Automata"
     },
@@ -76,6 +91,7 @@
       "title": "GenAI for Software Development",
       "discipline": "Computer Science",
       "semester": "Spring 2026",
+      "professor": "Mastropaolo",
       "description": "Building generative AI and deep learning to enhance and automate modern software development.",
       "repo": "https://github.com/jack-stawasz/LaTeX-Collections/tree/main/CSCI%20420)%20GenAI%20for%20Software%20Development"
     },
@@ -84,6 +100,8 @@
       "title":	"Ordinary Differential Equations",
       "discipline": "Mathematics",
       "semester": "Spring 2026",
+      "textbooks": ["blanchard-4e"],
+      "professor": "Dewage",
       "description": "Solving differential equations using numerical methods, bifurcations, and qualitative analysis.",
       "repo": "https://github.com/jack-stawasz/LaTeX-Collections/tree/main/MATH%20302)%20Ordinary%20Differential%20Equations"
     },
@@ -92,6 +110,8 @@
       "title": "Thermodynamics & Statistical Mechanics",
       "discipline": "Physics",
       "semester": "Fall 2025",
+      "textbooks": ["gould-tobochnik"],
+      "professor": "Armstrong",
       "description": "Quantum and thermal statistical mechanics applied to gases, solids, and radiation.",
       "repo": "https://github.com/jack-stawasz/LaTeX-Collections/tree/main/PHYS%20403)%20Statistical%20Mechanics%20%26%20Thermodynamics"
     },
@@ -100,6 +120,7 @@
       "title": "Data Structures",
       "discipline": "Computer Science",
       "semester": "Fall 2023",
+      "professor": "Chapman",
       "description": "Stack, queue, linked list, tree, graph structures."
     },
     {
@@ -107,6 +128,8 @@
       "title": "Discrete Structures",
       "discipline": "Computer Science",
       "semester": "Spring 2024",
+      "textbooks": ["rosen-8e"],
+      "professor": "Davis",
       "description": "Sets, functions, boolean algebra, first order predicate calculus, trees, graphs and discrete probability.",
       "repo": "https://github.com/jack-stawasz/LaTeX-Collections/tree/main/CSCI%20243)%20Discrete%20Structures"
     },
@@ -115,6 +138,7 @@
       "title": "Software Engineering",
       "discipline": "Computer Science",
       "semester": "Spring 2025",
+      "professor": "Coogan",
       "description": "Object-oriented class implementation, abstraction techniques, defensive programming, and testing."
     },
     {
@@ -122,6 +146,7 @@
       "title": "Algorithms",
       "discipline": "Computer Science",
       "semester": "Fall 2024",
+      "professor": "Zhang",
       "description": "Algorithm design, complexity analysis, and NP-complete problems such as sorting and hashing.",
       "repo": "https://github.com/jack-stawasz/LaTeX-Collections/tree/main/CSCI%20303)%20Algorithms"
     },
@@ -130,6 +155,7 @@
       "title": "Computer Organization",
       "discipline": "Computer Science",
       "semester": "Fall 2025",
+      "professor": "B. Ren",
       "description": "Assembly instructions, binary formatting, and hardware layouts.",
       "repo": "https://github.com/jack-stawasz/LaTeX-Collections/tree/main/CSCI%20304)%20Computer%20Organization"
     },
@@ -138,6 +164,7 @@
       "title": "Programming Languages",
       "discipline": "Computer Science",
       "semester": "Spring 2025",
+      "professor": "White",
       "description": "Programming paradigms and syntax for memory management, parameter passing, and event handling.",
       "repo": "https://github.com/jack-stawasz/LaTeX-Collections/tree/main/CSCI%20312)%20Principles%20of%20Programming%20Languages"
     },
@@ -146,6 +173,7 @@
       "title": "Fundamentals of AI/ML",
       "discipline": "Computer Science",
       "semester": "Fall 2025",
+      "professor": "Lewis",
       "description": "Core artificial intelligence and machine learning algorithms and their use cases.",
       "repo": "https://github.com/jack-stawasz/LaTeX-Collections/tree/main/CSCI%20416)%20AI%20%26%20Machine%20Learning"
     },
@@ -154,6 +182,7 @@
       "title": "Quantum Computing",
       "discipline": "Computer Science",
       "semester": "Fall 2025",
+      "professor": "Q. Li",
       "description": "Qubit superposition, algorithms, and quantum protocols for computing and fault tolerance.",
       "repo": "https://github.com/jack-stawasz/LaTeX-Collections/tree/main/CSCI%20420)%20Quantum%20Computing"
     },
@@ -162,6 +191,8 @@
       "title": "Data Driven Decision Making",
       "discipline": "Mathematics",
       "semester": "Spring 2024",
+      "textbooks": ["leemis-2e"],
+      "professor": "Leemis",
       "description": "Data analysis, visualization, and statistical inference in R.",
       "repo": "https://github.com/jack-stawasz/LaTeX-Collections/tree/main/MATH%20150)%20Data-Driven%20Decision%20Making"
     },
@@ -170,6 +201,8 @@
       "title": "Quantum Mechanics I",
       "discipline": "Physics",
       "semester": "Fall 2024",
+      "textbooks": ["townsend-2e"],
+      "professor": "Novikova",
       "description": "Non-relativistic solutions of the Schrodinger equation in one and three dimensions, symmetry, identical particles.",
       "repo": "https://github.com/jack-stawasz/LaTeX-Collections/tree/main/PHYS%20313)%20Quantum%20Mechanics%20I"
     },
@@ -178,6 +211,8 @@
       "title": "Quantum Mechanics II",
       "discipline": "Physics",
       "semester": "Spring 2025",
+      "textbooks": ["townsend-2e"],
+      "professor": "Mikhailov",
       "description": "Perturbation theory, approximate methods, and applications of quantum mechanics for atomic, solid state and nuclear physics.",
       "repo": "https://github.com/jack-stawasz/LaTeX-Collections/tree/main/PHYS%20314)%20Quantum%20Mechanics%20II"
     },
@@ -186,6 +221,8 @@
       "title": "Fluid Mechanics",
       "discipline": "Physics",
       "semester": "Fall 2026",
+      "textbooks": ["white-9e"],
+      "professor": "Mordijk",
       "description": "Properties of fluids, fluid statics and elementary dynamics, conservation of mass and momentum, flows in different settings, geofluid concepts and aerodynamics."
     },
     {
@@ -193,6 +230,8 @@
       "title": "Electricity & Magnetism II",
       "discipline": "Physics",
       "semester": "Fall 2026",
+      "textbooks": ["griffiths-5e"],
+      "professor": "Stark",
       "description": "Electrodynamics, electromagnetic waves and radiation, gauge transformations, and special relativity."
     },
     {
@@ -200,6 +239,8 @@
       "title": "Quantum Field Theory I",
       "discipline": "Physics",
       "semester": "Fall 2026",
+      "textbooks": ["peskin-schroeder"],
+      "professor": "Dudek",
       "description": "Canonical quantization of scalar, spinor, and vector fields; interacting field theories and Feynman diagrams; scattering theory; quantum electrodynamics; introduction to radiative corrections."
     },
     {
@@ -207,6 +248,7 @@
       "title": "Robotics",
       "discipline": "Computer Science",
       "semester": "Fall 2026",
+      "professor": "Woodlief",
       "description": "Software engineering for robot systems involving sensing, representing, and actuating the noisy physical world. Includes abstractions, architectures, libraries, and validation approaches."
     }
   ],
@@ -223,6 +265,8 @@
       "title": "General Physics I",
       "discipline": "Physics",
       "semester": "2021-2022",
+      "textbooks": ["knight-3e"],
+      "professor": "Ms. Condino",
       "description": "Mechanics, kinematics, forces, energy, and momentum."
     },
     {
@@ -230,6 +274,8 @@
       "title": "General Physics II",
       "discipline": "Physics",
       "semester": "2022-2023",
+      "textbooks": ["knight-4e"],
+      "professor": "Mr. Buczyna",
       "description": "Electricity, magnetism, circuits, waves, and optics."
     },
     {
@@ -237,6 +283,7 @@
       "title": "Calculus I",
       "discipline": "Mathematics",
       "semester": "Fall 2021",
+      "professor": "Ms. Wald",
       "description": "Limits, derivatives, integrals, and optimization applications."
     },
     {
@@ -244,6 +291,7 @@
       "title": "Calculus II",
       "discipline": "Mathematics",
       "semester": "Spring 2022",
+      "professor": "Ms. Wald",
       "description": "Advanced integration techniques and infinite sequences and series."
     },
     {
@@ -251,6 +299,7 @@
       "title": "Linear Algebra",
       "discipline": "Mathematics",
       "semester": "Spring 2023",
+      "professor": "Ms. Fitz",
       "description": "Vector spaces, matrices, eigenvalues, and linear transformations."
     },
     {
@@ -258,6 +307,7 @@
       "title": "Multivariable Calculus",
       "discipline": "Mathematics",
       "semester": "Fall 2022",
+      "professor": "Ms. Fitz",
       "description": "Multi-parametered functions, partial derivatives, and vector calculus."
     }
   ]

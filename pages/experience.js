@@ -15,6 +15,95 @@ function closePopup() {
 closeBtn.addEventListener('click', closePopup);
 popup.addEventListener('click', e => { if (e.target === popup) closePopup(); });
 
+const tbPopup = document.getElementById('textbook-popup');
+const tbBody  = document.getElementById('textbook-body');
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+}
+
+// Citations mark the italic title with *asterisks*
+function citationHtml(cite)  { return escapeHtml(cite).replace(/\*(.+?)\*/g, '<em>$1</em>'); }
+function citationText(cite)  { return cite.replace(/\*/g, ''); }
+
+async function copyCitation(cite, btn) {
+  const html = citationHtml(cite), text = citationText(cite);
+  try {
+    // Rich copy keeps the APA italics when pasted into Word or Docs
+    if (window.ClipboardItem) {
+      await navigator.clipboard.write([new ClipboardItem({
+        'text/html':  new Blob([html], { type: 'text/html' }),
+        'text/plain': new Blob([text], { type: 'text/plain' })
+      })]);
+    } else {
+      await navigator.clipboard.writeText(text);
+    }
+    btn.textContent = '✓ Copied';
+  } catch (err) {
+    console.error(err);
+    btn.textContent = 'Copy failed';
+  }
+  setTimeout(() => { btn.textContent = '📋 Copy citation'; }, 1600);
+}
+
+function openTextbookPopup(course, books) {
+  tbBody.innerHTML = '';
+
+  const hdr = document.createElement('h2');
+  hdr.id = 'textbook-heading';
+  hdr.className = 'textbook-heading';
+  hdr.textContent = `${course.number ? course.number + ' ' : ''}${course.title}`;
+  tbBody.appendChild(hdr);
+
+  books.forEach(b => {
+    const item = document.createElement('div');
+    item.className = 'textbook-item';
+
+    const cover = document.createElement('img');
+    cover.className = 'textbook-cover';
+    cover.src = `./data/textbooks/${b.isbn}.jpg`;
+    cover.alt = `Cover of ${b.title}`;
+    item.appendChild(cover);
+
+    const info = document.createElement('div');
+    info.className = 'textbook-info';
+    info.innerHTML = `
+      <h3 class="textbook-title">${escapeHtml(b.title)}</h3>
+      <p class="textbook-authors">${escapeHtml(b.authors)}${b.edition ? ' · ' + escapeHtml(b.edition) : ''}</p>
+      <p class="textbook-citation">${citationHtml(b.citation)}</p>
+      <p class="textbook-isbn">ISBN ${escapeHtml(b.isbn)}</p>`;
+
+    const links = document.createElement('div');
+    links.className = 'project-links textbook-links';
+    const copy = document.createElement('button');
+    copy.type = 'button';
+    copy.className = 'project-link';
+    copy.textContent = '📋 Copy citation';
+    copy.addEventListener('click', () => copyCitation(b.citation, copy));
+    links.appendChild(copy);
+    const lib = document.createElement('a');
+    lib.className = 'project-link';
+    lib.href = `https://search.worldcat.org/search?q=bn%3A${b.isbn}`;
+    lib.target = '_blank';
+    lib.rel = 'noopener noreferrer';
+    lib.textContent = '🏛️ Find in a library';
+    links.appendChild(lib);
+    info.appendChild(links);
+
+    item.appendChild(info);
+    tbBody.appendChild(item);
+  });
+
+  tbPopup.classList.remove('hidden');
+  tbPopup.querySelector('.close').focus();
+}
+
+function closeTextbookPopup() { tbPopup.classList.add('hidden'); }
+
+tbPopup.querySelector('.close').addEventListener('click', closeTextbookPopup);
+tbPopup.addEventListener('click', e => { if (e.target === tbPopup) closeTextbookPopup(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !tbPopup.classList.contains('hidden')) closeTextbookPopup(); });
+
 function initExpLogoSpin() {
   const ENTER_RADIUS = 70;
   const EXIT_RADIUS  = 120;
@@ -514,6 +603,8 @@ function initProjectsPanel() {
 ═══════════════════════════════════════════════════════════ */
 function initEducationPanel() {
   const EDU_JSON = './data/education.json';
+  const TB_JSON  = './data/textbooks/textbooks.json';
+  let eduTextbooks = {};
 
   if (_eduAbortController) _eduAbortController.abort();
   _eduAbortController = new AbortController();
@@ -570,6 +661,11 @@ function initEducationPanel() {
       const data = await res.json();
       if (typeof data !== 'object' || Array.isArray(data))
         throw new Error('Expected an object keyed by institution.');
+
+      // Courses still render if the textbook file fails; they just lose the Textbook link
+      eduTextbooks = await fetch(TB_JSON, { cache: 'no-store' })
+        .then(r => r.ok ? r.json() : {})
+        .catch(() => ({}));
 
       eduCourses    = [];
       eduDisciplines.clear();
@@ -642,6 +738,11 @@ function initEducationPanel() {
     else renderCardView(sorted);
   }
 
+  // School teachers (Mr./Ms.) keep their own title; everyone else is a professor
+  function professorLabel(name) {
+    return /^(Mr|Ms|Mrs)\.\s/.test(name) ? name : `Prof. ${name}`;
+  }
+
   function renderListView(courses) {
     courses.forEach(c => {
       if (!c.title) return;
@@ -652,7 +753,7 @@ function initEducationPanel() {
       el.dataset.discipline = c.discipline || '';
       el.dataset.institution = c.institution || '';
       el.dataset.description = (c.description || '').toLowerCase();
-      el.dataset.tags = (c.tags || []).join(' ').toLowerCase();
+      el.dataset.tags = [...(c.tags || []), c.professor || ''].join(' ').toLowerCase();
 
       const inner = document.createElement('span');
       inner.innerHTML = c.number
@@ -682,7 +783,7 @@ function initEducationPanel() {
       card.dataset.discipline = c.discipline || '';
       card.dataset.institution = c.institution || '';
       card.dataset.description = (c.description || '').toLowerCase();
-      card.dataset.tags = (c.tags || []).join(' ').toLowerCase();
+      card.dataset.tags = [...(c.tags || []), c.professor || ''].join(' ').toLowerCase();
 
       const badge = document.createElement('div');
       badge.className = 'institution-badge';
@@ -728,25 +829,38 @@ function initEducationPanel() {
       tags.className = 'course-tags';
       if (c.discipline) { const s = document.createElement('span'); s.className = 'course-tag'; s.textContent = c.discipline; tags.appendChild(s); }
       if (c.semester)   { const s = document.createElement('span'); s.className = 'course-tag'; s.textContent = c.semester;   tags.appendChild(s); }
+      if (c.professor)  { const s = document.createElement('span'); s.className = 'course-tag'; s.textContent = professorLabel(c.professor); tags.appendChild(s); }
       (c.tags || []).forEach(t => { const s = document.createElement('span'); s.className = 'course-tag'; s.textContent = t; tags.appendChild(s); });
 
-      // Put tags + View Work button on the same row (mirroring project-meta-row layout)
-      if (tags.children.length || c.repo) {
+      const books = (c.textbooks || []).map(id => eduTextbooks[id]).filter(Boolean);
+
+      // Put tags + View Work / Textbook buttons on the same row (mirroring project-meta-row layout)
+      if (tags.children.length || c.repo || books.length) {
         const row = document.createElement('div');
         row.className = 'project-meta-row';
         row.style.marginTop = '8px';
 
         if (tags.children.length) row.appendChild(tags);
 
-        if (c.repo) {
+        if (c.repo || books.length) {
           const links = document.createElement('div');
           links.className = 'project-links';
-          const a = document.createElement('a');
-          a.href = c.repo;
-          a.className = 'project-link';
-          a.textContent = '📦 View Work';
-          a.addEventListener('click', ev => { ev.preventDefault(); window.open(c.repo, '_blank', 'noopener,noreferrer'); });
-          links.appendChild(a);
+          if (c.repo) {
+            const a = document.createElement('a');
+            a.href = c.repo;
+            a.className = 'project-link';
+            a.textContent = '📦 View Work';
+            a.addEventListener('click', ev => { ev.preventDefault(); window.open(c.repo, '_blank', 'noopener,noreferrer'); });
+            links.appendChild(a);
+          }
+          if (books.length) {
+            const a = document.createElement('a');
+            a.href = '#';
+            a.className = 'project-link';
+            a.textContent = books.length > 1 ? '📖 Textbooks' : '📖 Textbook';
+            a.addEventListener('click', ev => { ev.preventDefault(); openTextbookPopup(c, books); });
+            links.appendChild(a);
+          }
           row.appendChild(links);
         }
 

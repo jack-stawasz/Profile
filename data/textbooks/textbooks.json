@@ -1,0 +1,97 @@
+{
+  "knight-3e": {
+    "title": "Physics for Scientists and Engineers: A Strategic Approach with Modern Physics",
+    "authors": "Randall D. Knight",
+    "edition": "3rd edition",
+    "isbn": "9780321740908",
+    "citation": "Knight, R. D. (2013). *Physics for scientists and engineers: A strategic approach with modern physics* (3rd ed.). Pearson."
+  },
+  "knight-4e": {
+    "title": "Physics for Scientists and Engineers: A Strategic Approach with Modern Physics",
+    "authors": "Randall D. Knight",
+    "edition": "4th edition",
+    "isbn": "9780133942651",
+    "citation": "Knight, R. D. (2017). *Physics for scientists and engineers: A strategic approach with modern physics* (4th ed.). Pearson."
+  },
+  "serway-3e": {
+    "title": "Modern Physics",
+    "authors": "Raymond A. Serway, Clement J. Moses, Curt A. Moyer",
+    "edition": "3rd edition",
+    "isbn": "9780534493394",
+    "citation": "Serway, R. A., Moses, C. J., & Moyer, C. A. (2005). *Modern physics* (3rd ed.). Brooks/Cole."
+  },
+  "malvino-9e": {
+    "title": "Electronic Principles",
+    "authors": "Albert P. Malvino, David J. Bates, Patrick E. Hoppe",
+    "edition": "9th edition",
+    "isbn": "9781259852695",
+    "citation": "Malvino, A. P., Bates, D. J., & Hoppe, P. E. (2021). *Electronic principles* (9th ed.). McGraw Hill."
+  },
+  "boas-3e": {
+    "title": "Mathematical Methods in the Physical Sciences",
+    "authors": "Mary L. Boas",
+    "edition": "3rd edition",
+    "isbn": "9780471198260",
+    "citation": "Boas, M. L. (2006). *Mathematical methods in the physical sciences* (3rd ed.). Wiley."
+  },
+  "white-9e": {
+    "title": "Fluid Mechanics",
+    "authors": "Frank M. White, Henry Xue",
+    "edition": "9th edition",
+    "isbn": "9781260258318",
+    "citation": "White, F. M., & Xue, H. (2021). *Fluid mechanics* (9th ed.). McGraw Hill."
+  },
+  "townsend-2e": {
+    "title": "A Modern Approach to Quantum Mechanics",
+    "authors": "John S. Townsend",
+    "edition": "2nd edition",
+    "isbn": "9781891389788",
+    "citation": "Townsend, J. S. (2012). *A modern approach to quantum mechanics* (2nd ed.). University Science Books."
+  },
+  "taylor": {
+    "title": "Classical Mechanics",
+    "authors": "John R. Taylor",
+    "isbn": "9781891389221",
+    "citation": "Taylor, J. R. (2005). *Classical mechanics*. University Science Books."
+  },
+  "griffiths-5e": {
+    "title": "Introduction to Electrodynamics",
+    "authors": "David J. Griffiths",
+    "edition": "5th edition",
+    "isbn": "9781009397759",
+    "citation": "Griffiths, D. J. (2023). *Introduction to electrodynamics* (5th ed.). Cambridge University Press."
+  },
+  "gould-tobochnik": {
+    "title": "Statistical and Thermal Physics: With Computer Applications",
+    "authors": "Harvey Gould, Jan Tobochnik",
+    "isbn": "9780691137445",
+    "citation": "Gould, H., & Tobochnik, J. (2010). *Statistical and thermal physics: With computer applications*. Princeton University Press."
+  },
+  "peskin-schroeder": {
+    "title": "An Introduction to Quantum Field Theory",
+    "authors": "Michael E. Peskin, Daniel V. Schroeder",
+    "isbn": "9780201503975",
+    "citation": "Peskin, M. E., & Schroeder, D. V. (1995). *An introduction to quantum field theory*. Addison-Wesley."
+  },
+  "rosen-8e": {
+    "title": "Discrete Mathematics and Its Applications",
+    "authors": "Kenneth H. Rosen",
+    "edition": "8th edition",
+    "isbn": "9781259676512",
+    "citation": "Rosen, K. H. (2019). *Discrete mathematics and its applications* (8th ed.). McGraw-Hill Education."
+  },
+  "leemis-2e": {
+    "title": "Learning Base R",
+    "authors": "Lawrence M. Leemis",
+    "edition": "2nd edition",
+    "isbn": "9780982917459",
+    "citation": "Leemis, L. M. (2022). *Learning base R* (2nd ed.). Ascended Ideas."
+  },
+  "blanchard-4e": {
+    "title": "Differential Equations",
+    "authors": "Paul Blanchard, Robert L. Devaney, Glen R. Hall",
+    "edition": "4th edition",
+    "isbn": "9780495561989",
+    "citation": "Blanchard, P., Devaney, R. L., & Hall, G. R. (2012). *Differential equations* (4th ed.). Brooks/Cole, Cengage Learning."
+  }
+}
