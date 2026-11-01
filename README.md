@@ -2,4 +2,4 @@
 
 ## Site Link
 
-https://jackstawasz.github.io/Profile/
+https://jack-stawasz.github.io/Profile/

@@ -11,7 +11,7 @@
     "title": "Sudoku Clone",
     "description": "The Sudoku game rebuilt from scratch. Includes a backtracking solver algorithm and random puzzle generation.",
     "tags": ["java-swing", "gui", "game"],
-    "repo": "https://github.com/JackStawasz/WM-Code/tree/main/sudoku",
+    "repo": "https://github.com/jack-stawasz/WM-Code/tree/main/sudoku",
     "thumbnail": "data/projects/sudoku_logo.png",
     "organization": "W&M Computer Science"
   },
@@ -42,7 +42,7 @@
     "title": "Address Hash Table",
     "description": "Implementation of a hash table with collision resolution via chaining.",
     "tags": ["data-structures", "c++"],
-    "repo": "https://github.com/JackStawasz/WM-Code/tree/main/hashing",
+    "repo": "https://github.com/jack-stawasz/WM-Code/tree/main/hashing",
     "thumbnail": "data/projects/hash_addresses.png",
     "organization": "W&M Computer Science"
   },
@@ -50,8 +50,8 @@
     "title": "Portfolio Website",
     "description": "Website showcasing my professional accomplishments and technical creativity.",
     "tags": ["design", "html"],
-    "url": "https://jackstawasz.github.io/Profile/",
-    "repo": "https://github.com/JackStawasz/Profile",
+    "url": "https://jack-stawasz.github.io/Profile/",
+    "repo": "https://github.com/jack-stawasz/Profile",
     "thumbnail": "data/projects/portfolio.png",
     "organization": "Self-Driven"
   }

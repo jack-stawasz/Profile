@@ -530,6 +530,17 @@ select.exp-search:invalid          { color: var(--muted); }
   font-size: 0.94rem;
   line-height: 1.5;
   transition: background 0.15s;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.course-list-semester {
+  flex-shrink: 0;
+  color: var(--muted, rgba(255,255,255,0.55));
+  font-size: 0.85rem;
+  white-space: nowrap;
 }
 
 .course-list-item:hover    { background: rgba(255,255,255,0.025); }

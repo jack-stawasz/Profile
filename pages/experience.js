@@ -660,6 +660,13 @@ function initEducationPanel() {
         : c.title;
       el.appendChild(inner);
 
+      if (c.semester) {
+        const sem = document.createElement('span');
+        sem.className = 'course-list-semester';
+        sem.textContent = c.semester;
+        el.appendChild(sem);
+      }
+
       contentEl.appendChild(el);
     });
   }
