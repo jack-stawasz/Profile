@@ -54,5 +54,33 @@
     "repo": "https://github.com/jack-stawasz/Profile",
     "thumbnail": "data/projects/portfolio.png",
     "organization": "Self-Driven"
+  },
+  {
+    "title": "Drone Navigation",
+    "description": "Quadcopter simulation for world perception, path planning, and object classification.",
+    "tags": ["robotics", "ROS2"],
+    "thumbnail": "data/projects/quadcopter.png",
+    "organization": "W&M Computer Science"
+  },
+  {
+    "title": "Neutral Current Investigation",
+    "description": "Cross section analysis on Z-boson neutrino events across experimental cuts.",
+    "tags": ["neutrinos", "CAFana", "python"],
+    "thumbnail": "",
+    "organization": "W&M Honors Thesis"
+  },
+  {
+    "title": "PlotForge",
+    "description": "Plotting interface for multi-plot collaboration with LaTeX rendering and Jupyter-notebook-styled windows.",
+    "tags": ["plotting", "design"],
+    "thumbnail": "data/projects/plotforge.png",
+    "organization": "Self-Driven"
+  },
+  {
+    "title": "Marine Graph Coarsening",
+    "description": "Coarsening algorithm for Chesapeake bay mesh with error bounding and AI surrogate ocean model.",
+    "tags": ["AI", "marine science"],
+    "thumbnail": "data/projects/chesapeake_mesh.png",
+    "organization": "VIMS"
   }
 ]
