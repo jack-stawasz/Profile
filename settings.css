@@ -358,7 +358,7 @@ html.palette-swap *::after {
 }
 
 /* ── Animations off ─────────────────────────────────────────── */
-body.no-animations .exp-logo {
+body.no-animations .spin-logo {
   transform: none !important;
   transition: none !important;
 }

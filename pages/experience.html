@@ -2,6 +2,7 @@
 
   <!-- ── Sub-tab bar ─────────────────────────────────────── -->
   <div class="exp-tabs-outer">
+  <div class="exp-bar">
   <nav class="exp-tabs" aria-label="Experience categories">
     <button class="exp-tab active" data-tab="positions">
       <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true">
@@ -30,33 +31,19 @@
     </button>
     <div class="exp-ink" aria-hidden="true"></div>
   </nav>
+  <!-- The open tab's search and buttons move here (initExperience) -->
+  <div class="exp-bar-controls" id="exp-bar-controls"></div>
+  </div>
   </div>
 
   <!-- ── Positions panel ────────────────────────────────── -->
   <div class="exp-panel" id="exp-panel-positions">
-    <header class="exp-header">
-      <div class="exp-header-left">
-        <div class="exp-header-text">
-          <h1>Positions</h1>
-          <p class="muted">Fetched from <code>positions.json</code></p>
-        </div>
-        <svg class="exp-logo" aria-hidden="true"><use href="#logo"></use></svg>
-      </div>
-    </header>
     <div id="pos-status" class="exp-status loading" role="status">Loading positions…</div>
     <div id="pos-list" class="exp-list" hidden></div>
   </div>
 
   <!-- ── Projects panel ─────────────────────────────────── -->
   <div class="exp-panel" id="exp-panel-projects" hidden>
-    <header class="exp-header">
-      <div class="exp-header-left">
-        <div class="exp-header-text">
-          <h1>Projects</h1>
-          <p class="muted">Fetched from <code>projects.json</code></p>
-        </div>
-        <svg class="exp-logo" aria-hidden="true"><use href="#logo"></use></svg>
-      </div>
       <div class="exp-controls">
         <input class="exp-search" id="proj-q" placeholder="Search projects…" aria-label="Search projects"/>
         <div class="exp-control-buttons">
@@ -124,21 +111,12 @@
 
         </div>
       </div>
-    </header>
     <div id="proj-status" class="exp-status loading" role="status">Loading projects…</div>
     <div id="proj-list" class="exp-list" hidden></div>
   </div>
 
   <!-- ── Education panel ────────────────────────────────── -->
   <div class="exp-panel" id="exp-panel-education" hidden>
-    <header class="exp-header">
-      <div class="exp-header-left">
-        <div class="exp-header-text">
-          <h1>Education</h1>
-          <p class="muted">Fetched from <code>education.json</code></p>
-        </div>
-        <svg class="exp-logo" aria-hidden="true"><use href="#logo"></use></svg>
-      </div>
       <div class="exp-controls">
         <input class="exp-search" id="edu-q" placeholder="Search courses…" aria-label="Search courses"/>
         <div class="exp-control-buttons">
@@ -205,7 +183,6 @@
 
         </div>
       </div>
-    </header>
     <div id="edu-status" class="exp-status loading" role="status">Loading courses…</div>
     <div id="edu-content" class="exp-edu-content" hidden></div>
   </div>

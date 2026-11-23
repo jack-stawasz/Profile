@@ -145,42 +145,6 @@ function wireDropdowns(pairs, signal) {
   return closeAll;
 }
 
-function initExpLogoSpin() {
-  const ENTER_RADIUS = 70;
-  const EXIT_RADIUS  = 120;
-  const logoStates   = new WeakMap();
-
-  function getState(logo) {
-    if (!logoStates.has(logo)) logoStates.set(logo, { spinning: false, angle: 0 });
-    return logoStates.get(logo);
-  }
-
-  document.addEventListener('mousemove', e => {
-    if (window.SiteSettings && !window.SiteSettings.animationsEnabled) return;
-    document.querySelectorAll('.exp-logo').forEach(logo => {
-      const rect  = logo.getBoundingClientRect();
-      const dist  = Math.hypot(e.clientX - (rect.left + rect.width / 2), e.clientY - (rect.top + rect.height / 2));
-      const state = getState(logo);
-
-      if (!state.spinning && dist <= ENTER_RADIUS) {
-        state.spinning = true;
-        state.angle   += 360;
-        logo.style.transition = 'transform 0.7s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease, filter 0.3s ease';
-        logo.style.transform  = `rotate(${state.angle}deg) scale(1.12)`;
-        logo.style.opacity    = '1';
-        logo.style.filter     = 'drop-shadow(0 0 12px color-mix(in srgb, var(--accent) 85%, transparent))';
-      } else if (state.spinning && dist > EXIT_RADIUS) {
-        state.spinning = false;
-        state.angle    = Math.round(state.angle / 360) * 360;
-        logo.style.transition = 'transform 0.7s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease, filter 0.3s ease';
-        logo.style.transform  = `rotate(${state.angle}deg) scale(1)`;
-        logo.style.opacity    = '0.6';
-        logo.style.filter     = 'drop-shadow(0 0 6px color-mix(in srgb, var(--accent) 40%, transparent))';
-      }
-    });
-  });
-}
-
 let _eduAbortController = null;
 let eduCourses     = [];
 let eduDisciplines = new Set();
@@ -229,7 +193,6 @@ function makeListCap(container, getViewMode) {
 }
 
 function initExperience() {
-  initExpLogoSpin();
   const tabs   = document.querySelectorAll('.exp-tab');
   const inkEl  = document.querySelector('.exp-ink');
   const panels = {
@@ -237,6 +200,16 @@ function initExperience() {
     projects:  document.getElementById('exp-panel-projects'),
     education: document.getElementById('exp-panel-education'),
   };
+
+  // Each panel's search and buttons sit in the tab bar, beside the tabs, shown while their tab is open
+  const barControls = document.getElementById('exp-bar-controls');
+  const controls = {};
+  Object.entries(panels).forEach(([k, el]) => {
+    const c = el.querySelector('.exp-controls');
+    if (!c) return;
+    controls[k] = c;
+    barControls.appendChild(c);
+  });
 
   let activeTab   = 'positions';
   let posInited   = false;
@@ -253,6 +226,7 @@ function initExperience() {
     activeTab = name;
     tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === name));
     Object.entries(panels).forEach(([k, el]) => { el.hidden = k !== name; });
+    Object.entries(controls).forEach(([k, el]) => { el.hidden = k !== name; });
     positionInk(document.querySelector(`.exp-tab[data-tab="${name}"]`));
 
     if (name === 'positions' && !posInited) {
