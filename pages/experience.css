@@ -485,7 +485,7 @@ select.exp-search:invalid          { color: var(--muted); }
   border-radius: 999px;
   background: var(--accent-dim);
   color: var(--accent);
-  border: 1px solid rgba(125,211,252,0.07);
+  border: 1px solid color-mix(in srgb, var(--accent) 7%, transparent);
 }
 
 .project-links {
@@ -697,7 +697,7 @@ select.exp-search:invalid          { color: var(--muted); }
   border-radius: 999px;
   background: var(--accent-dim);
   color: var(--accent);
-  border: 1px solid rgba(125,211,252,0.07);
+  border: 1px solid color-mix(in srgb, var(--accent) 7%, transparent);
 }
 
 @media (max-width: 768px) {
@@ -806,3 +806,27 @@ select.exp-search:invalid          { color: var(--muted); }
   .textbook-cover { width: 140px; }
 }
 
+/* ── Show all / Show fewer under a capped list ─────────────── */
+.exp-capped { display: none !important; }
+
+.exp-show-all {
+  display: block;
+  margin: 1rem auto 0;
+  padding: 0.5rem 1.25rem;
+  border: 1px solid var(--accent-border);
+  border-radius: 999px;
+  background: var(--accent-dim);
+  color: var(--accent);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.exp-show-all:hover {
+  background: var(--accent-mid);
+  border-color: var(--accent);
+}
+
+.exp-show-all[hidden] { display: none; }

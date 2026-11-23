@@ -168,14 +168,14 @@ function initExpLogoSpin() {
         logo.style.transition = 'transform 0.7s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease, filter 0.3s ease';
         logo.style.transform  = `rotate(${state.angle}deg) scale(1.12)`;
         logo.style.opacity    = '1';
-        logo.style.filter     = 'drop-shadow(0 0 12px rgba(125,211,252,0.85))';
+        logo.style.filter     = 'drop-shadow(0 0 12px color-mix(in srgb, var(--accent) 85%, transparent))';
       } else if (state.spinning && dist > EXIT_RADIUS) {
         state.spinning = false;
         state.angle    = Math.round(state.angle / 360) * 360;
         logo.style.transition = 'transform 0.7s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease, filter 0.3s ease';
         logo.style.transform  = `rotate(${state.angle}deg) scale(1)`;
         logo.style.opacity    = '0.6';
-        logo.style.filter     = 'drop-shadow(0 0 6px rgba(125,211,252,0.4))';
+        logo.style.filter     = 'drop-shadow(0 0 6px color-mix(in srgb, var(--accent) 40%, transparent))';
       }
     });
   });
@@ -186,7 +186,7 @@ let eduCourses     = [];
 let eduDisciplines = new Set();
 let eduOrgs        = new Set();
 let eduSortOrder   = ['organization', 'number', 'department', 'semester'];
-let eduReverseSort = false;
+let eduReverseSort = true;   // descending by default: W&M and 400-level courses first
 let eduViewMode    = 'card';
 let eduFilters     = { organizations: new Set(), disciplines: new Set() };
 
@@ -194,9 +194,39 @@ let _projAbortController = null;
 let projProjects    = [];
 let projOrgs        = new Set();
 let projSortOrder   = ['title', 'organization', 'difficulty', 'has-link', 'has-repo'];
-let projReverseSort = false;
+let projReverseSort = true;
 let projViewMode    = 'card';
 let projFilters     = { organizations: new Set() };
+
+// Long lists show their first few items and a Show all button, so the page never nests a scroll box
+const LIST_CAP = { card: 4, list: 12 };
+
+function makeListCap(container, getViewMode) {
+  let expanded = false;
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'exp-show-all';
+  btn.hidden = true;
+  container.after(btn);
+
+  // Runs after every render or filter; items a filter hid (display: none) don't count
+  function apply() {
+    container.querySelectorAll(':scope > .exp-capped').forEach(el => el.classList.remove('exp-capped'));
+    const shown = [...container.children].filter(el => el.style.display !== 'none');
+    const limit = LIST_CAP[getViewMode()];
+    btn.hidden = container.hidden || shown.length <= limit;
+    if (btn.hidden) return;
+    if (!expanded) shown.slice(limit).forEach(el => el.classList.add('exp-capped'));
+    btn.textContent = expanded ? 'Show fewer' : `Show all ${shown.length}`;
+  }
+
+  btn.addEventListener('click', () => {
+    expanded = !expanded;
+    apply();
+    if (!expanded) btn.scrollIntoView({ block: 'nearest', behavior: scrollBehavior() });
+  });
+  return apply;
+}
 
 function initExperience() {
   initExpLogoSpin();
@@ -339,7 +369,7 @@ function initProjectsPanel() {
   projProjects    = [];
   projOrgs        = new Set();
   projSortOrder   = ['title', 'organization', 'difficulty', 'has-link', 'has-repo'];
-  projReverseSort = false;
+  projReverseSort = true;
   projViewMode    = 'card';
   projFilters     = { organizations: new Set() };
 
@@ -353,6 +383,7 @@ function initProjectsPanel() {
   const filterBtn  = document.getElementById('proj-filter-btn');
   const filterDrop = document.getElementById('proj-filter-drop');
   const reverseBtn = document.getElementById('proj-reverse-btn');
+  reverseBtn.classList.toggle('active', projReverseSort);
   const clearBtn   = document.getElementById('proj-clear-btn');
   const applyBtn   = document.getElementById('proj-apply-btn');
 
@@ -515,7 +546,11 @@ function initProjectsPanel() {
           a.innerHTML = '🔗 Go to Project';
           a.title = 'View project';
           a.setAttribute('aria-label', `Open ${p.title || 'project'}`);
-          a.addEventListener('click', e => { e.preventDefault(); openPopup(p.url); });
+          // Sites that forbid framing (X-Frame-Options) show a blocked page in the popup, so they get a tab
+          a.addEventListener('click', e => {
+            e.preventDefault();
+            p.newTab ? window.open(p.url, '_blank', 'noopener,noreferrer') : openPopup(p.url);
+          });
           links.appendChild(a);
         }
 
@@ -569,8 +604,11 @@ function initProjectsPanel() {
     return filtered;
   }
 
+  const capProjects = makeListCap(listEl, () => projViewMode);
+
   function updateDisplay() {
     renderProjects(filterAndSort());
+    capProjects();
   }
 
   const closeDropdowns = wireDropdowns([[viewBtn, viewDrop], [sortBtn, sortDrop], [filterBtn, filterDrop]], signal);
@@ -619,7 +657,7 @@ function initEducationPanel() {
   eduDisciplines = new Set();
   eduOrgs        = new Set();
   eduSortOrder   = ['organization', 'number', 'department', 'semester'];
-  eduReverseSort = false;
+  eduReverseSort = true;
   eduViewMode    = 'card';
   eduFilters     = { organizations: new Set(), disciplines: new Set() };
 
@@ -633,6 +671,7 @@ function initEducationPanel() {
   const filterBtn  = document.getElementById('edu-filter-btn');
   const filterDrop = document.getElementById('edu-filter-drop');
   const reverseBtn = document.getElementById('edu-reverse-btn');
+  reverseBtn.classList.toggle('active', eduReverseSort);
   const clearBtn   = document.getElementById('edu-clear-btn');
   const applyBtn   = document.getElementById('edu-apply-btn');
 
@@ -904,7 +943,10 @@ function initEducationPanel() {
 
     if (!visible && eduCourses.length) showStatus('No courses match your filters.', 'empty');
     else if (eduCourses.length) clearStatus();
+    capCourses();
   }
+
+  const capCourses = makeListCap(contentEl, () => eduViewMode);
 
   function updateDisplay() { renderEducation(); filterCourses(); }
 

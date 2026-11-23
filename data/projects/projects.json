@@ -27,6 +27,7 @@
     "description": "Models for 24 mechanical components in CAD built from online blueprints.",
     "tags": ["3d-printing", "cad", "fusion360"],
     "url": "https://ed.iitm.ac.in/~raman/Autodesk%20Inventor%20Practice%20Part%20Drawings.pdf",
+    "newTab": true,
     "thumbnail": "data/projects/fusion_binoculars.png",
     "organization": "Self-Driven"
   },
