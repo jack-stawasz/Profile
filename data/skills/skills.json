@@ -85,6 +85,11 @@
       "description": "Object-oriented programming"
     },
     {
+      "name": "JavaScript",
+      "icon": "🌐",
+      "description": "Interactive web pages and canvas animation"
+    },
+    {
       "name": "Julia",
       "icon": "🔶",
       "description": "Numerical and scientific computing"
@@ -103,6 +108,11 @@
       "name": "Git",
       "icon": "📦",
       "description": "Version control and collaboration"
+    },
+    {
+      "name": "Docker",
+      "icon": "🐳",
+      "description": "Containerized, reproducible software environments"
     },
     {
       "name": "LaTeX",
@@ -150,6 +160,11 @@
       "name": "Fusion 360",
       "icon": "🎨",
       "description": "CAD design and 3D modeling"
+    },
+    {
+      "name": "3D Printing",
+      "icon": "🖨️",
+      "description": "Printing parts modeled in CAD"
     }
   ]
 }
