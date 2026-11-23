@@ -368,14 +368,15 @@ main.hidden { opacity: 0; }
   display: flex;
   align-items: center;
   justify-content: center;
-  backdrop-filter: blur(4px);
   z-index: 1000;
   opacity: 0;
+  visibility: hidden;
   pointer-events: none;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease, visibility 0s 0.3s;
 }
 
-.popup:not(.hidden)       { opacity: 1; pointer-events: all; }
+/* No backdrop blur: re-blurring the whole window every frame is what made an open popup lag */
+.popup:not(.hidden)       { opacity: 1; visibility: visible; pointer-events: all; transition: opacity 0.3s ease; }
 
 .popup-content {
   background: var(--container);

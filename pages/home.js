@@ -118,6 +118,23 @@ async function initHome() {
   
   homeAnimationController = controller;
 
+  // The banner sleeps while it is scrolled out of view or a popup covers the page, and wakes when neither holds
+  const popupOpen = () => document.querySelector('.popup:not(.hidden)') !== null;
+  controller.offscreen = false;
+  controller.sleeping = false;
+  controller.wake = function() {
+    if (!this.isRunning || !this.sleeping || this.offscreen || popupOpen()) return;
+    this.sleeping = false;
+    animate();
+  };
+  new IntersectionObserver(([entry]) => {
+    controller.offscreen = !entry.isIntersecting;
+    controller.wake();
+  }).observe(canvas);
+  const popupWatch = new MutationObserver(() => controller.wake());
+  document.querySelectorAll('.popup').forEach(p =>
+    popupWatch.observe(p, { attributes: true, attributeFilter: ['class'] }));
+
   let displayWidth, displayHeight, CENTER_X, CENTER_Y, signal, fourier, nova;
 
   function setupCanvas() {
@@ -309,6 +326,11 @@ async function initHome() {
 
   function animate() {
     if (!controller.isRunning) return;
+    if (controller.offscreen || popupOpen()) {
+      controller.sleeping = true;
+      controller.animationId = null;
+      return;
+    }
 
     const now = performance.now();
     nova.draw(ctx, now);
