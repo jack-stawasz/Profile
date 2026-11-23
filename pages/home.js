@@ -6,11 +6,6 @@ async function loadSkillsData() {
     const response = await fetch('data/skills/skills.json');
     if (!response.ok) throw new Error('Failed to load skills data');
     skillsData = await response.json();
-    console.log('Skills data loaded successfully:', Object.keys(skillsData));
-    console.log('Physics skills count:', skillsData.physics?.length);
-    console.log('Math skills count:', skillsData.math?.length);
-    console.log('Programming skills count:', skillsData.programming?.length);
-    console.log('Tools skills count:', skillsData.tools?.length);
   } catch (error) {
     console.error('Error loading skills:', error);
     skillsData = null;
@@ -146,16 +141,19 @@ async function initHome() {
     if (nova) nova.resize(displayWidth, displayHeight);
     else nova = createNovaDisplay(displayWidth, displayHeight);
 
+    // The terms are precomputed in path units (pages/banner/signature-fourier.js); the path is 11 units tall.
+    // A narrow banner (a phone) shrinks the signature to 90% of its width and centers it, instead of cutting it off
+    const b = SIGNATURE_FOURIER.bounds;
+    const SCALE = Math.min(displayHeight / 11 * 0.6, 0.9 * displayWidth / (b.x1 - b.x0));
     CENTER_X = displayWidth / 3;
+    if (CENTER_X + b.x0 * SCALE < 0.05 * displayWidth || CENTER_X + b.x1 * SCALE > 0.95 * displayWidth) {
+      CENTER_X = displayWidth / 2 - (b.x0 + b.x1) / 2 * SCALE;
+    }
     CENTER_Y = displayHeight / 2;
-
-    // The terms are precomputed in path units (pages/banner/signature-fourier.js); the path is 11 units tall
-    const SCALE = displayHeight / 11 * 0.6;
     fourier = SIGNATURE_FOURIER.terms.map(([freq, amp, phase]) => ({ freq, amp: amp * SCALE, phase }));
 
     // Neutrino vertices land outside the signature, with room for a vertex's hadron blob; tracks still cross it
     const VERTEX_CLEARANCE = 40;
-    const b = SIGNATURE_FOURIER.bounds;
     nova.avoid({
       x0: CENTER_X + b.x0 * SCALE - VERTEX_CLEARANCE,
       x1: CENTER_X + b.x1 * SCALE + VERTEX_CLEARANCE,
@@ -493,7 +491,6 @@ function initSkillsCarousel() {
     return;
   }
   
-  console.log('Initializing carousel with data:', skillsData);
   
   // Create carousel wrapper
   const carouselWrapper = document.createElement('div');
