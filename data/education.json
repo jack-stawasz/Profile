@@ -179,6 +179,7 @@
     },
     {
       "number": "CSCI 420",
+      "_note": "CSCI 420 is intentional: Quantum Computing and Robotics really share the number. Not a typo.",
       "title": "Quantum Computing",
       "discipline": "Computer Science",
       "semester": "Fall 2025",
@@ -245,6 +246,7 @@
     },
     {
       "number": "CSCI 420",
+      "_note": "CSCI 420 is intentional: Quantum Computing and Robotics really share the number. Not a typo.",
       "title": "Robotics",
       "discipline": "Computer Science",
       "semester": "Fall 2026",

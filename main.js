@@ -78,6 +78,9 @@ document.addEventListener('mouseover', e => {
   el.removeAttribute('title');
 });
 
+// The footer sits above the scripts, so it already exists here
+document.getElementById('footer-year').textContent = new Date().getFullYear();
+
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
     initCustomCursor();
