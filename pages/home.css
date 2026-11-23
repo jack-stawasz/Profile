@@ -406,6 +406,7 @@ body.no-animations .typed-intro::after { animation: none; }
   will-change: transform;
   cursor: grab;
   user-select: none;
+  touch-action: pan-y;
 }
 
 .testimonials-track.grabbing { cursor: grabbing; }

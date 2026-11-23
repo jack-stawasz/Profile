@@ -411,6 +411,10 @@ select.exp-search:invalid          { color: var(--muted); }
 }
 
 .project-meta      { flex: 1; min-width: 0; }
+
+/* The organization tag sits in the card's top-right corner; the title starts below it instead of wrapping around it */
+.project-card .project-meta,
+.course-card .course-meta  { padding-top: 1.35rem; }
 .project-title     { margin: 0; font-size: 1.15rem; }
 
 .project-desc {
@@ -473,7 +477,6 @@ select.exp-search:invalid          { color: var(--muted); }
 
 /* Positions: project cards that open their bullets on click */
 .position-card                 { cursor: pointer; }
-.position-card .project-title  { padding-right: 9rem; }
 .position-icon                 { font-size: 2.2rem; background: var(--accent-dim); }
 
 .position-when {

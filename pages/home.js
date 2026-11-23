@@ -183,8 +183,7 @@ async function initHome() {
   let trace = [];
 
   // The arm is a debug view; the trace only needs the arm's end point
-  function drawEpicycles(x, y, fourier) {
-    const showArm = Boolean(window.SiteSettings && window.SiteSettings.debugMode);
+  function drawEpicycles(x, y, fourier, showArm) {
     for (const f of fourier) {
       const px = x;
       const py = y;
@@ -203,9 +202,14 @@ async function initHome() {
     return { x, y };
   }
 
-  const DURATION = 5;
-  const dt = (2 * Math.PI) / (DURATION * 60);
-  const MAX_TRACE_POINTS = 300; // Reduced from 500
+  // The pen takes STEPS evenly spaced steps per pass, timed by the clock: a fast screen and a slow one draw at the
+  // same speed, and a slow frame takes several steps at once, so the line never has gaps
+  const CYCLE_MS = 8000;
+  const STEPS = 300;
+  const STEP_MS = CYCLE_MS / STEPS;
+  const dt = (2 * Math.PI) / STEPS;
+  const MAX_TRACE_POINTS = STEPS;   // one full pass
+  let lastStep = 0;
   const TRACE_BANDS = 12;   // brightness steps along the trace's fade
   const HALO = [[16, 0.35], [9, 0.55]];   // [width px, black alpha] strokes; overlapping, the center is darkest
 
@@ -295,19 +299,25 @@ async function initHome() {
     nova.draw(ctx, now);
     drawHalo();
 
-    const v = drawEpicycles(CENTER_X, CENTER_Y, fourier);
-
     if (!isSettled) {
       if (settleStart === null) settleStart = now;
       if (now - settleStart >= SETTLE_TIME) {
         isSettled = true;
         time = 0;
         trace = [];
+        lastStep = now;
       }
     } else {
-      trace.push(v);
-      if (trace.length > MAX_TRACE_POINTS) trace.shift();
+      // After a long gap (the banner asleep) the steps are capped at one pass
+      const steps = Math.min(STEPS, Math.floor((now - lastStep) / STEP_MS));
+      lastStep = steps === STEPS ? now : lastStep + steps * STEP_MS;
+      for (let i = 0; i < steps; i++) {
+        trace.push(drawEpicycles(CENTER_X, CENTER_Y, fourier, false));
+        if (trace.length > MAX_TRACE_POINTS) trace.shift();
+        time = (time + dt) % (2 * Math.PI);
+      }
     }
+    if (window.SiteSettings && window.SiteSettings.debugMode) drawEpicycles(CENTER_X, CENTER_Y, fourier, true);
 
     if (trace.length > 1) drawTrace();
 
@@ -387,12 +397,6 @@ async function initHome() {
         ctx.stroke();
       }
       ctx.shadowBlur = 0;
-    }
-
-    time += dt;
-
-    if (time >= 2 * Math.PI) {
-      time = time % (2 * Math.PI);
     }
 
     controller.animationId = requestAnimationFrame(animate);
@@ -878,7 +882,8 @@ function attachParticles(host, triggerEl, zIndex = '5') {
 
   let rgb = accentRgb();
 
-  triggerEl.addEventListener('mouseenter', () => {
+  function start() {
+    if (animationId) return;
     canvas.style.opacity = '1';
     rgb = accentRgb();
     particles = [];
@@ -893,15 +898,28 @@ function attachParticles(host, triggerEl, zIndex = '5') {
         size: Math.random() * 2 + 1
       });
     }
-    if (!animationId) animate();
-  });
+    animate();
+  }
 
-  triggerEl.addEventListener('mouseleave', () => {
+  function stop() {
     canvas.style.opacity = '0';
     if (animationId) {
       cancelAnimationFrame(animationId);
       animationId = null;
     }
+  }
+
+  // A mouse starts them on entering; a touch has no hover, and a long press or text selection fires no mouse
+  // events, so any touch inside starts them and a touch elsewhere stops them
+  triggerEl.addEventListener('mouseenter', start);
+  triggerEl.addEventListener('mouseleave', stop);
+  triggerEl.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse') start(); });
+  document.addEventListener('pointerdown', e => {
+    if (e.pointerType !== 'mouse' && !triggerEl.contains(e.target)) stop();
+  });
+  document.addEventListener('selectionchange', () => {
+    const sel = document.getSelection();
+    if (sel && !sel.isCollapsed && triggerEl.contains(sel.anchorNode)) start();
   });
 
   function animate() {

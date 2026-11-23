@@ -55,7 +55,7 @@
 
 .settings-dialog {
   width: min(94vw, 520px);
-  max-height: min(86vh, 560px);
+  max-height: min(90vh, 720px);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -167,8 +167,9 @@
 /* ── Theme swatches ─────────────────────────────────────────── */
 .settings-swatches {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 170px));
+  justify-content: center;
+  gap: 14px 18px;
 }
 
 /* The miniature is the tile: no frame around it, and the open palette gets an accent ring */
@@ -241,9 +242,6 @@
   text-align: center;
 }
 
-@media (max-width: 480px) {
-  .settings-swatches { grid-template-columns: repeat(2, 1fr); }
-}
 
 /* ── Text size slider ───────────────────────────────────────── */
 .settings-font {
