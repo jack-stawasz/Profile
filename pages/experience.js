@@ -233,11 +233,13 @@ function initExperience() {
   const tabs   = document.querySelectorAll('.exp-tab');
   const inkEl  = document.querySelector('.exp-ink');
   const panels = {
+    positions: document.getElementById('exp-panel-positions'),
     projects:  document.getElementById('exp-panel-projects'),
     education: document.getElementById('exp-panel-education'),
   };
 
-  let activeTab   = 'projects';
+  let activeTab   = 'positions';
+  let posInited   = false;
   let projInited  = false;
   let eduInited   = false;
 
@@ -253,6 +255,10 @@ function initExperience() {
     Object.entries(panels).forEach(([k, el]) => { el.hidden = k !== name; });
     positionInk(document.querySelector(`.exp-tab[data-tab="${name}"]`));
 
+    if (name === 'positions' && !posInited) {
+      posInited = true;
+      initPositionsPanel(switchTab);
+    }
     if (name === 'projects' && !projInited) {
       projInited = true;
       initProjectsPanel();
@@ -271,11 +277,124 @@ function initExperience() {
     positionInk(document.querySelector('.exp-tab.active'));
   });
 
-  switchTab('projects');
+  switchTab('positions');
 
   window.addEventListener('resize', () => {
     positionInk(document.querySelector('.exp-tab.active'));
   });
+}
+
+// ==================================================
+// Positions: compact cards whose bullets open on click, with chips that jump to the role's projects
+// ==================================================
+async function initPositionsPanel(switchTab) {
+  const listEl   = document.getElementById('pos-list');
+  const statusEl = document.getElementById('pos-status');
+
+  let positions, projects;
+  try {
+    [positions, projects] = await Promise.all(['./data/positions.json', './data/projects/projects.json']
+      .map(url => fetch(url, { cache: 'no-store' }).then(r => { if (!r.ok) throw new Error(url); return r.json(); })));
+  } catch {
+    statusEl.className = 'exp-status error';
+    statusEl.textContent = 'Failed to load positions.';
+    return;
+  }
+
+  // The projects panel builds its cards after its own fetch, and a capped list hides the later ones
+  async function jumpToProject(title) {
+    switchTab('projects');
+    const projList = document.getElementById('proj-list');
+    const selector = `:scope > [data-title="${CSS.escape(title.toLowerCase())}"]`;
+    let card = null;
+    for (let i = 0; i < 100 && !(card = projList.querySelector(selector)); i++) {
+      await new Promise(r => setTimeout(r, 30));
+    }
+    if (!card) return;
+    if (card.classList.contains('exp-capped')) projList.nextElementSibling?.click();
+    card.scrollIntoView({ behavior: scrollBehavior(), block: 'center' });
+    card.classList.remove('exp-flash');
+    void card.offsetWidth;
+    card.classList.add('exp-flash');
+  }
+
+  function chip(label, onClick) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'position-chip';
+    btn.textContent = label;
+    btn.addEventListener('click', e => { e.stopPropagation(); onClick(); });
+    return btn;
+  }
+
+  positions.forEach(pos => {
+    const card = document.createElement('article');
+    card.className = 'project-card position-card';
+    card.tabIndex = 0;
+    card.setAttribute('role', 'button');
+    card.setAttribute('aria-expanded', 'false');
+
+    const org = document.createElement('div');
+    org.className = 'organization';
+    org.textContent = pos.organization;
+
+    const thumb = document.createElement('div');
+    thumb.className = 'project-thumb position-icon';
+    thumb.textContent = pos.icon || pos.organization.slice(0, 2).toUpperCase();
+
+    const meta = document.createElement('div');
+    meta.className = 'project-meta';
+    const title = document.createElement('h2');
+    title.className = 'project-title';
+    title.textContent = pos.title;
+    const when = document.createElement('p');
+    when.className = 'position-when';
+    when.textContent = `${pos.start} – ${pos.end} · ${pos.location}`;
+    const summary = document.createElement('p');
+    summary.className = 'project-desc';
+    summary.textContent = pos.summary;
+    meta.append(title, when, summary);
+
+    const bullets = document.createElement('ul');
+    bullets.className = 'position-bullets';
+    bullets.hidden = true;
+    (pos.bullets || []).forEach(text => {
+      const li = document.createElement('li');
+      li.textContent = text;
+      bullets.appendChild(li);
+    });
+    meta.appendChild(bullets);
+
+    const chips = document.createElement('div');
+    chips.className = 'project-tags';
+    // Lands the tab bar just below the fixed navbar, so the newly opened tab shows it is the active one
+    if (pos.tab) chips.appendChild(chip(`${pos.tab.label} →`, () => {
+      switchTab(pos.tab.name);
+      const navH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--nav-h')) || 0;
+      const tabsTop = document.querySelector('.exp-tabs-outer').getBoundingClientRect().top + window.scrollY;
+      window.scrollTo({ top: tabsTop - navH - 8, behavior: scrollBehavior() });
+    }));
+    projects.filter(p => (pos.projectOrgs || []).includes(p.organization))
+      .forEach(p => chips.appendChild(chip(p.title, () => jumpToProject(p.title))));
+    if (chips.children.length) meta.appendChild(chips);
+
+    const toggle = () => {
+      bullets.hidden = !bullets.hidden;
+      card.setAttribute('aria-expanded', String(!bullets.hidden));
+    };
+    card.addEventListener('click', toggle);
+    card.addEventListener('keydown', e => {
+      if (e.target !== card || (e.key !== 'Enter' && e.key !== ' ')) return;
+      e.preventDefault();
+      toggle();
+    });
+
+    card.append(org, thumb, meta);
+    listEl.appendChild(card);
+  });
+
+  statusEl.hidden = true;
+  listEl.hidden = false;
 }
 
 /* ═══════════════════════════════════════════════════════════

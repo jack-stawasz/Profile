@@ -1,0 +1,90 @@
+[
+  {
+    "title": "Physics with Honors & Computer Science",
+    "organization": "William & Mary",
+    "location": "Williamsburg, VA",
+    "start": "Aug 2023",
+    "end": "May 2027",
+    "icon": "🎓",
+    "summary": "Double major, GPA 3.91, expected graduation May 2027.",
+    "bullets": [
+      "Honors thesis: Simulating Neutral Current Neutrino Cross Sections Across Different Experimental Cuts",
+      "Select coursework: Quantum Mechanics, Quantum Field Theory, Classical Mechanics, Electricity & Magnetism, Machine Learning, Software Engineering, Data Structures & Algorithms"
+    ],
+    "projectOrgs": ["W&M Honors Thesis"],
+    "tab": { "label": "Courses", "name": "education" }
+  },
+  {
+    "title": "NOvA Project Collaborator",
+    "organization": "Fermilab",
+    "location": "Batavia, IL (remote)",
+    "start": "Jan 2025",
+    "end": "Present",
+    "icon": "⚛️",
+    "summary": "Neutral current neutrino analysis on the NOvA experiment.",
+    "bullets": [
+      "Evaluate cross section corrections on neutral current selections involving background, efficiency, and unfolding",
+      "Developed data-driven cosmic ray muon simulation refinements for neutrino detector calibration",
+      "Process ~100,000 CAFAna files in Python and C to produce ROOT trees",
+      "Compare real and simulated neutrinos across hundreds of electron shower events",
+      "Completed the Neutrino University program on neutrino interactions, generators, and physics"
+    ],
+    "projectOrgs": ["Fermilab", "W&M Honors Thesis"]
+  },
+  {
+    "title": "Student Researcher",
+    "organization": "VIMS",
+    "location": "Gloucester Point, VA (remote)",
+    "start": "May 2026",
+    "end": "Present",
+    "icon": "🌊",
+    "summary": "Mesh coarsening for the SCHISM ocean model of the Chesapeake Bay.",
+    "bullets": [
+      "Developing mesh coarsening for a SCHISM ocean-model grid (51K nodes) to reduce simulation cost",
+      "Building an interpolation-based error metric using 10 years of hourly model output on the W&M HPC cluster"
+    ],
+    "projectOrgs": ["VIMS"]
+  },
+  {
+    "title": "Associate Researcher",
+    "organization": "NIST",
+    "location": "Gaithersburg, MD",
+    "start": "May 2025",
+    "end": "Aug 2025",
+    "icon": "🔬",
+    "summary": "Ultrafast nonlinear spectroscopy of thin silicon films.",
+    "bullets": [
+      "Performed nonlinear pump-probe ultrafast supercontinuum spectroscopy in thin silicon films",
+      "Simulated 1000+ quantum probability reflections in Julia, fit across 5 million spectrum files to extract refractive index and absorption coefficient changes",
+      "Constructed an apparatus to measure the national standard of third-order nonlinear susceptibility in thin films"
+    ],
+    "projectOrgs": ["NIST"]
+  },
+  {
+    "title": "Student Researcher",
+    "organization": "W&M Quantum Optics Lab",
+    "location": "Williamsburg, VA",
+    "start": "Aug 2024",
+    "end": "Dec 2024",
+    "icon": "💡",
+    "summary": "Rubidium vapor cell quality assurance.",
+    "bullets": [
+      "Proceduralized rubidium vapor cell quality assurance via precise atom density fluctuations",
+      "Rendered oscilloscope data in Matlab and Python by fitting atomic transitions onto transmission plots"
+    ],
+    "projectOrgs": ["W&M Quantum Optics Lab"]
+  },
+  {
+    "title": "Peer Tutor",
+    "organization": "TutorZone",
+    "location": "Williamsburg, VA",
+    "start": "Jan 2026",
+    "end": "Present",
+    "icon": "📚",
+    "summary": "Physics, math, and computer science tutoring at William & Mary.",
+    "bullets": [
+      "Offer 10 hours of tutoring weekly for a portfolio of over 30 courses across Physics, Math, and Computer Science"
+    ],
+    "projectOrgs": []
+  }
+]

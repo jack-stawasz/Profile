@@ -3,7 +3,15 @@
   <!-- ── Sub-tab bar ─────────────────────────────────────── -->
   <div class="exp-tabs-outer">
   <nav class="exp-tabs" aria-label="Experience categories">
-    <button class="exp-tab active" data-tab="projects">
+    <button class="exp-tab active" data-tab="positions">
+      <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true">
+        <rect x="0.5" y="4" width="14" height="9.5" rx="1.5" stroke="currentColor"/>
+        <path d="M5 4V2.5a1 1 0 011-1h3a1 1 0 011 1V4" stroke="currentColor"/>
+        <line x1="0.5" y1="8" x2="14.5" y2="8" stroke="currentColor"/>
+      </svg>
+      Positions
+    </button>
+    <button class="exp-tab" data-tab="projects">
       <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true">
         <rect x="0.5" y="0.5" width="5.5" height="5.5" rx="1" stroke="currentColor"/>
         <rect x="9"   y="0.5" width="5.5" height="5.5" rx="1" stroke="currentColor"/>
@@ -24,8 +32,23 @@
   </nav>
   </div>
 
+  <!-- ── Positions panel ────────────────────────────────── -->
+  <div class="exp-panel" id="exp-panel-positions">
+    <header class="exp-header">
+      <div class="exp-header-left">
+        <div class="exp-header-text">
+          <h1>Positions</h1>
+          <p class="muted">Fetched from <code>positions.json</code></p>
+        </div>
+        <svg class="exp-logo" aria-hidden="true"><use href="#logo"></use></svg>
+      </div>
+    </header>
+    <div id="pos-status" class="exp-status loading" role="status">Loading positions…</div>
+    <div id="pos-list" class="exp-list" hidden></div>
+  </div>
+
   <!-- ── Projects panel ─────────────────────────────────── -->
-  <div class="exp-panel" id="exp-panel-projects">
+  <div class="exp-panel" id="exp-panel-projects" hidden>
     <header class="exp-header">
       <div class="exp-header-left">
         <div class="exp-header-text">

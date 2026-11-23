@@ -514,6 +514,50 @@ select.exp-search:invalid          { color: var(--muted); }
   transform: translateY(-2px);
 }
 
+/* Positions: project cards that open their bullets on click */
+.position-card                 { cursor: pointer; }
+.position-card .project-title  { padding-right: 9rem; }
+.position-icon                 { font-size: 2.2rem; background: var(--accent-dim); }
+
+.position-when {
+  margin: 3px 0 0;
+  font-size: 0.82rem;
+  color: var(--accent);
+}
+
+.position-bullets {
+  margin: 8px 0 0;
+  padding-left: 1.1rem;
+  font-size: 0.88rem;
+  line-height: 1.4;
+  color: var(--text);
+}
+
+.position-bullets li + li { margin-top: 4px; }
+.position-card .project-tags { margin-top: 8px; }
+
+.position-chip {
+  font: inherit;
+  font-size: 0.76rem;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--accent-dim);
+  color: var(--accent);
+  border: 1px solid var(--accent-border);
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.position-chip:hover { background: var(--accent-mid); border-color: var(--accent); }
+
+/* A project a position chip jumped to */
+@keyframes expFlash {
+  0%, 60% { box-shadow: 0 0 0 3px var(--accent), 0 0 24px var(--accent-ring); }
+  100%    { box-shadow: 0 6px 18px var(--shadow); }
+}
+
+.project-card.exp-flash { animation: expFlash 1.6s ease-out; opacity: 1; transform: none; }
+
 .project-difficulty {
   position: absolute;
   bottom: 0.55rem;
