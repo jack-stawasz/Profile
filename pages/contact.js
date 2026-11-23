@@ -115,7 +115,7 @@ function initContacts() {
           point.x, point.y, maxGlowRadius
         );
         
-        const alpha = totalIntensity;
+        const alpha = 1.1 * totalIntensity;
         gradient.addColorStop(0.00, `rgba(${colorRGB}, ${alpha * 1.000})`);
         gradient.addColorStop(0.25, `rgba(${colorRGB}, ${alpha * 0.317})`);
         gradient.addColorStop(0.50, `rgba(${colorRGB}, ${alpha * 0.1})`);
@@ -146,5 +146,34 @@ function initContacts() {
         animationId = null;
       }
     });
+  });
+
+  initCardTilt();
+}
+
+function initCardTilt() {
+  const card = document.querySelector('.profile-card');
+  if (!card || window.matchMedia('(hover: none)').matches) return;
+
+  const MAX_TILT = 10; // degrees at the card's edges
+  let frame = null;
+
+  // The corner under the cursor dips away, so the card leans toward it
+  card.addEventListener('pointermove', e => {
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduced || (window.SiteSettings && !window.SiteSettings.animationsEnabled)) return;
+    if (frame) return;
+    frame = requestAnimationFrame(() => {
+      frame = null;
+      const rect = card.getBoundingClientRect();
+      const nx = (e.clientX - rect.left) / rect.width * 2 - 1;
+      const ny = (e.clientY - rect.top) / rect.height * 2 - 1;
+      card.style.transform = `perspective(900px) rotateX(${-ny * MAX_TILT}deg) rotateY(${nx * MAX_TILT}deg)`;
+    });
+  });
+
+  card.addEventListener('pointerleave', () => {
+    if (frame) { cancelAnimationFrame(frame); frame = null; }
+    card.style.transform = '';
   });
 }
