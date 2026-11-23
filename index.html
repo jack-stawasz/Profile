@@ -39,18 +39,22 @@
         </div>
         <div class="nav-right">
           <ul class="nav-links">
-            <li><a href="#pages/home" class="active">Home</a></li>
-            <li><a href="#pages/experience">Experience</a></li>
-            <li><a href="#pages/contact">Contact</a></li>
+            <li><a href="#home" class="active">Home</a></li>
+            <li><a href="#experience">Experience</a></li>
+            <li><a href="#skills">Skills</a></li>
+            <li><a href="#contact">Contact</a></li>
           </ul>
         </div>
       </div>
     </nav>
 
+    <!-- Each section loads pages/<id>.html, in page order -->
     <main id="main-content">
-      <section id="home">Loading Home Page…</section>
-      <section id="experience" hidden>Loading Experience…</section>
-      <section id="contact"    hidden>Loading Contact…</section>
+      <section id="home"></section>
+      <section id="experience"></section>
+      <section id="skills"></section>
+      <section id="testimonials"></section>
+      <section id="contact"></section>
     </main>
 
     <div id="popup" class="popup hidden">
@@ -81,6 +85,7 @@
 
   <script src="settings.js"></script>
   <script src="main.js"></script>
+  <script src="pages/banner/nova-events.js"></script>
   <script src="pages/home.js"></script>
   <script src="pages/experience.js"></script>
   <script src="pages/contact.js"></script>

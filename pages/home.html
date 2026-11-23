@@ -4,7 +4,6 @@
     <div class="fourier-banner">
       <div class="banner-content">
         <div class="canvas-container">
-          <div class="overlay-text" id="welcome-text">Welcome to My Portfolio</div>
           <canvas id="fourierCanvas"></canvas>
         </div>
       </div>
@@ -30,6 +29,7 @@
   <!-- Main Content -->
   <div class="home-content">
     <div class="home-grid">
+      <p class="typed-intro" id="welcome-text" aria-live="off"></p>
       <div class="card particle-bg">
         <h2>Current Research</h2>
         <p>Calculating the Weinberg angle from neutrino interaction events. There is much literature on charged
@@ -38,51 +38,6 @@
           using Python and ROOT.
         </p>
       </div>
-
-      <div class="skills-card">
-        <h2>Skills</h2>
-        
-        <!-- Category Bookmarks -->
-        <div class="category-bookmarks">
-          <button class="category-bookmark active" data-category="physics">⚛️ Physics</button>
-          <button class="category-bookmark" data-category="math">∑ Math</button>
-          <button class="category-bookmark" data-category="programming">💻 Programming</button>
-          <button class="category-bookmark" data-category="tools">🔧 Tools</button>
-        </div>
-
-        <!-- Carousel -->
-        <div class="carousel-container">
-          <div class="carousel-track" id="skillsTrack">
-            <!-- Slides will be dynamically inserted here -->
-          </div>
-        </div>
-
-        <!-- Navigation -->
-        <div class="carousel-nav">
-          <button class="carousel-btn" id="prevBtn" aria-label="Previous skill">‹</button>
-          <button class="carousel-btn" id="nextBtn" aria-label="Next skill">›</button>
-        </div>
-
-      </div>
-
-      <!-- Testimonials -->
-      <div class="testimonials-section" id="testimonials-section">
-        <div class="testimonials-header">
-          <h2>Testimonials</h2>
-        </div>
-        <div class="testimonials-track-wrapper" id="testimonials-wrapper">
-          <div class="testimonials-track" id="testimonials-track">
-            <!-- Cards injected by JS -->
-          </div>
-        </div>
-        <div class="testimonials-controls">
-          <button class="testimonials-pause-btn" id="testimonials-pause" aria-label="Pause / resume scrolling">
-          </button>
-          <input type="range" class="testimonials-scrubber" id="testimonials-scrubber"
-                 min="0" max="1000" value="0" step="1" aria-label="Scroll position">
-        </div>
-      </div>
-
     </div>
   </div>
 </section>

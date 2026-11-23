@@ -22,26 +22,25 @@ async function initHome() {
     homeAnimationController.stop();
   }
   
-  // Load skills data first
-  await loadSkillsData();
-  
   initTextRotation();
-  initSkillsCarousel();
-  if (!window.SiteSettings || window.SiteSettings.animationsEnabled) {
-    initParticleCards();
-  }
   initTestimonials();
+
+  // The banner starts without waiting for the skills data; the carousel and the card particles follow it in
+  loadSkillsData().then(() => {
+    initSkillsCarousel();
+    if (!window.SiteSettings || window.SiteSettings.animationsEnabled) {
+      initParticleCards();
+    }
+  });
 
   const canvas = document.getElementById("fourierCanvas");
   if (!canvas) return;
 
   const banner = document.querySelector('.fourier-banner');
-  const overlayText = document.querySelector('.overlay-text');
 
   function showStaticBanner() {
     if (!banner) return;
     canvas.style.display = 'none';
-    if (overlayText) overlayText.style.animation = 'none';
     if (!banner.querySelector('.static-sig-svg')) {
       const svgNS = 'http://www.w3.org/2000/svg';
       const svg = document.createElementNS(svgNS, 'svg');
@@ -61,7 +60,7 @@ async function initHome() {
       const path = document.createElementNS(svgNS, 'path');
       path.setAttribute('d', document.getElementById('svgPath')?.getAttribute('d') || '');
       path.setAttribute('fill', 'none');
-      path.setAttribute('stroke', 'rgba(125,211,252,0.9)');
+      path.style.stroke = 'color-mix(in srgb, var(--accent) 90%, transparent)';
       path.setAttribute('stroke-width', '0.18');
       path.setAttribute('stroke-linecap', 'round');
       path.setAttribute('stroke-linejoin', 'round');
@@ -74,7 +73,6 @@ async function initHome() {
   function showAnimatedBanner() {
     if (!banner) return;
     canvas.style.display = '';
-    if (overlayText) overlayText.style.animation = '';
     const staticSvg = banner.querySelector('.static-sig-svg');
     if (staticSvg) staticSvg.remove();
   }
@@ -120,16 +118,18 @@ async function initHome() {
   
   homeAnimationController = controller;
 
-  let displayWidth, displayHeight, CENTER_X, CENTER_Y, signal, fourier;
+  let displayWidth, displayHeight, CENTER_X, CENTER_Y, signal, fourier, nova;
 
   function setupCanvas() {
     const container = canvas.parentElement;
     displayWidth = container.offsetWidth;
     displayHeight = container.offsetHeight;
-    
+
     canvas.width = displayWidth;
     canvas.height = displayHeight;
-    
+    if (nova) nova.resize(displayWidth, displayHeight);
+    else nova = createNovaDisplay(displayWidth, displayHeight);
+
     CENTER_X = displayWidth / 3;
     CENTER_Y = displayHeight / 2;
 
@@ -140,6 +140,17 @@ async function initHome() {
     fourier = dft(signal).filter(f =>
       f.freq <= half || f.freq >= signal.length - half
     );
+
+    // Neutrino vertices land outside the signature, with room for a vertex's hadron blob; tracks still cross it
+    const VERTEX_CLEARANCE = 40;
+    const xs = signal.map(p => p.re);
+    const ys = signal.map(p => p.im);
+    nova.avoid({
+      x0: CENTER_X + Math.min(...xs) - VERTEX_CLEARANCE,
+      x1: CENTER_X + Math.max(...xs) + VERTEX_CLEARANCE,
+      y0: CENTER_Y + Math.min(...ys) - VERTEX_CLEARANCE,
+      y1: CENTER_Y + Math.max(...ys) + VERTEX_CLEARANCE,
+    });
   }
 
   setupCanvas();
@@ -159,28 +170,6 @@ async function initHome() {
 
   let time = 0;
   let trace = [];
-  let dots = [];
-  let dotTime = 0;
-  let nextDotId = 0;
-
-  function initDots() {
-    const numDots = 15;
-    for (let i = 0; i < numDots; i++) {
-      dots.push(createDot(i * 0.5));
-    }
-  }
-
-  function createDot(offset) {
-    return {
-      id: nextDotId++,
-      spawnTime: dotTime - offset,
-      phase: Math.random() * Math.PI * 2,
-      speed: 0.65 + Math.random() * 0.1,
-      trail: []
-    };
-  }
-
-  initDots();
 
   function sampleSVG(path, N) {
     const len = path.getTotalLength();
@@ -216,7 +205,9 @@ async function initHome() {
     return X.sort((a, b) => b.amp - a.amp);
   }
 
+  // The arm is a debug view; the trace only needs the arm's end point
   function drawEpicycles(x, y, fourier, signal) {
+    const showArm = Boolean(window.SiteSettings && window.SiteSettings.debugMode);
     for (const f of fourier) {
       const px = x;
       const py = y;
@@ -224,7 +215,8 @@ async function initHome() {
       const angle = k * time + f.phase;
       x += f.amp * Math.cos(angle);
       y += f.amp * Math.sin(angle);
-      
+      if (!showArm) continue;
+
       ctx.strokeStyle = "#fff";
       ctx.lineWidth = 1.0;
       ctx.beginPath();
@@ -238,10 +230,34 @@ async function initHome() {
   const DURATION = 5;
   const dt = (2 * Math.PI) / (DURATION * 60);
   const MAX_TRACE_POINTS = 300; // Reduced from 500
+  const TRACE_BANDS = 12;   // brightness steps along the trace's fade
+  const HALO = [[16, 0.35], [9, 0.55]];   // [width px, black alpha] strokes; overlapping, the center is darkest
+
+  // A soft dark outline under the signature cuts back any event crossing it, like an outline on text
+  function drawHalo() {
+    if (trace.length < 2) return;
+    ctx.save();
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    for (let i = 0; i < trace.length; i++) {
+      const p = trace[i];
+      const prev = trace[i - 1];
+      // The trace's own breaks (jumps of 30 px or more) stay breaks in the outline
+      if (!prev || Math.hypot(p.x - prev.x, p.y - prev.y) >= 30) ctx.moveTo(p.x, p.y);
+      else ctx.lineTo(p.x, p.y);
+    }
+    for (const [lineWidth, alpha] of HALO) {
+      ctx.lineWidth = lineWidth;
+      ctx.strokeStyle = `rgba(0, 0, 0, ${alpha})`;
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
 
   let isSettled = false;
-  const SETTLE_TIME = 1;
-  let settleCounter = 0;
+  const SETTLE_TIME = 400;   // ms from the banner's first frame to the signature's first stroke
+  let settleStart = null;
 
   let userDrawing = false;
   let userTrace = [];
@@ -294,83 +310,15 @@ async function initHome() {
   function animate() {
     if (!controller.isRunning) return;
 
-    ctx.fillStyle = "#111";
-    ctx.fillRect(0, 0, displayWidth, displayHeight);
-
-    const positions = [];
-    let groupCenterY = 0;
-    const dotsToRemove = [];
-    
-    for (let i = 0; i < dots.length; i++) {
-      const dot = dots[i];
-      const t = (dotTime - dot.spawnTime) * dot.speed;
-      const x = -50 + (t * (displayWidth + 100) / 10);
-      
-      if (x > displayWidth + 100) {
-        dotsToRemove.push(i);
-        continue;
-      }
-      
-      if (x < displayWidth + 50) {
-        const progress = ((x + 50) / (displayWidth + 100));
-        const bandCenterY = displayHeight * 0.725 + Math.sin((1 - progress) * Math.PI * 2) * (displayHeight * 0.1);
-        const swoosh1 = Math.sin((dotTime - dot.spawnTime) * 1.5 + dot.phase) * (displayHeight * 0.085);
-        const swoosh2 = Math.sin((dotTime - dot.spawnTime) * 0.8 + dot.phase * 1.3) * (displayHeight * 0.06);
-        let y = bandCenterY + swoosh1 + swoosh2;
-        positions.push({ x, y, index: i });
-        groupCenterY += y;
-      }
-    }
-    
-    for (let i = dotsToRemove.length - 1; i >= 0; i--) {
-      dots.splice(dotsToRemove[i], 1);
-      dots.push(createDot(0));
-    }
-    
-    groupCenterY = positions.length > 0 ? groupCenterY / positions.length : displayHeight * 0.725;
-    
-    for (let i = 0; i < positions.length; i++) {
-      const dotAlpha = 0.5;
-      const posData = positions[i];
-      const dot = dots[posData.index];
-      let pos = { x: posData.x, y: posData.y };
-      
-      pos.y = pos.y + (groupCenterY - pos.y) * 0.125;
-      
-      dot.trail.push({ x: pos.x, y: pos.y });
-      if (dot.trail.length > 20) dot.trail.shift();
-      
-      if (dot.trail.length > 1) {
-        for (let j = 0; j < dot.trail.length - 1; j++) {
-          const fadeProgress = j / (dot.trail.length - 1);
-          const alpha = fadeProgress * 0.85;
-          const size = 1.5 + fadeProgress * 2.5;
-          const glowSize = 20 * fadeProgress;
-          
-          ctx.shadowBlur = glowSize;
-          ctx.shadowColor = `rgba(100, 150, 255, ${0.6 * alpha * dotAlpha})`;
-          ctx.fillStyle = `rgba(120, 170, 255, ${alpha * dotAlpha})`;
-          ctx.beginPath();
-          ctx.arc(dot.trail[j].x, dot.trail[j].y, size, 0, Math.PI * 2);
-          ctx.fill();
-        }
-      }
-      
-      ctx.shadowBlur = 25;
-      ctx.shadowColor = `rgba(100, 150, 255, ${dotAlpha}))`;
-      ctx.fillStyle = `rgba(150, 200, 255, ${dotAlpha})`;
-      ctx.beginPath();
-      ctx.arc(pos.x, pos.y, 4, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    
-    ctx.shadowBlur = 0;
+    const now = performance.now();
+    nova.draw(ctx, now);
+    drawHalo();
 
     const v = drawEpicycles(CENTER_X, CENTER_Y, fourier, signal);
-    
+
     if (!isSettled) {
-      settleCounter++;
-      if (settleCounter >= SETTLE_TIME * 60) {
+      if (settleStart === null) settleStart = now;
+      if (now - settleStart >= SETTLE_TIME) {
         isSettled = true;
         time = 0;
         trace = [];
@@ -380,30 +328,7 @@ async function initHome() {
       if (trace.length > MAX_TRACE_POINTS) trace.shift();
     }
 
-    if (trace.length > 1) {
-      ctx.lineWidth = 2.5;
-      let prev = null;
-      let currentPath = [];
-      
-      for (let i = 0; i < trace.length; i++) {
-        const p = trace[i];
-        if (prev) {
-          const dx = p.x - prev.x;
-          const dy = p.y - prev.y;
-          const dist = Math.hypot(dx, dy);
-          if (dist < 30) {
-            currentPath.push(p);
-          } else {
-            if (currentPath.length > 1) drawPathWithGlow(currentPath);
-            currentPath = [p];
-          }
-        } else {
-          currentPath = [p];
-        }
-        prev = p;
-      }
-      if (currentPath.length > 1) drawPathWithGlow(currentPath);
-    }
+    if (trace.length > 1) drawTrace();
 
     if (userTrace.length > 1) {
       ctx.lineWidth = 2;
@@ -420,27 +345,27 @@ async function initHome() {
       return true;
     });
 
-    function drawPathWithGlow(pathPoints) {
-      for (let i = 1; i < pathPoints.length; i++) {
-        const age = trace.length - trace.indexOf(pathPoints[i]);
-        const fadeFactor = Math.max(0, 1 - (age / trace.length));
-        const enhancedFade = Math.pow(fadeFactor, 1.2);
-        const brightness = 40 + (205 * enhancedFade);
-        const alpha = 0.3 + (0.7 * enhancedFade);
-        
-        if (enhancedFade > 0.5) {
-          ctx.shadowBlur = 15 * enhancedFade;
-          ctx.shadowColor = `rgb(0, ${brightness}, 0)`;
-        } else {
-          ctx.shadowBlur = 0;
-        }
-        
-        ctx.strokeStyle = `rgba(0, ${brightness}, 0, ${alpha})`;
-        ctx.beginPath();
-        ctx.moveTo(pathPoints[i-1].x, pathPoints[i-1].y);
-        ctx.lineTo(pathPoints[i].x, pathPoints[i].y);
-        ctx.stroke();
+    // Segments fade with age; grouped into bands of equal brightness, each band is one stroke and one glow pass
+    function drawTrace() {
+      const bands = Array.from({ length: TRACE_BANDS }, () => new Path2D());
+      for (let i = 1; i < trace.length; i++) {
+        const p = trace[i];
+        const prev = trace[i - 1];
+        if (Math.hypot(p.x - prev.x, p.y - prev.y) >= 30) continue;   // the signature's own pen lifts
+        const fadeFactor = 1 - (trace.length - i) / trace.length;
+        const band = Math.min(TRACE_BANDS - 1, Math.floor(fadeFactor * TRACE_BANDS));
+        bands[band].moveTo(prev.x, prev.y);
+        bands[band].lineTo(p.x, p.y);
       }
+      ctx.lineWidth = 2.5;
+      bands.forEach((band, b) => {
+        const enhancedFade = Math.pow((b + 0.5) / TRACE_BANDS, 1.2);
+        const brightness = 40 + (205 * enhancedFade);
+        ctx.shadowBlur = enhancedFade > 0.5 ? 15 * enhancedFade : 0;
+        ctx.shadowColor = `rgb(0, ${brightness}, 0)`;
+        ctx.strokeStyle = `rgba(0, ${brightness}, 0, ${0.3 + 0.7 * enhancedFade})`;
+        ctx.stroke(band);
+      });
       ctx.shadowBlur = 0;
     }
 
@@ -484,7 +409,6 @@ async function initHome() {
     }
 
     time += dt;
-    dotTime += dt;
 
     if (time >= 2 * Math.PI) {
       time = time % (2 * Math.PI);
@@ -675,8 +599,8 @@ function initSkillsCarousel() {
     const imagePath = `data/skills/${imageName}.png`;
     
     slide.innerHTML = `
-      <img src="${imagePath}" alt="${skill.name}" class="skill-image" loading="lazy" onerror="this.remove()">
-      <div class="skill-icon-large">${skill.icon}</div>
+      <img src="${imagePath}" alt="${skill.name}" class="skill-image"
+        loading="lazy" decoding="async" onerror="this.remove()">
       <div class="skill-name">${skill.icon} ${skill.name}</div>
       <div class="skill-description">${skill.description}</div>
     `;
@@ -898,13 +822,7 @@ function initParticleCards() {
     attachParticles(card, card);
   });
 
-  // Particle effect covering the whole skills card (header + carousel)
-  const skillsCard = document.querySelector('.skills-card');
-  if (skillsCard) {
-    attachParticles(skillsCard, skillsCard, '2');
-  }
-
-  // Particle effect on the testimonials section — z-index 1 so cards (default stacking) sit above it
+  // Particle effect on the testimonials section, under its cards (their track sits at z-index 2)
   const testimonialsSection = document.getElementById('testimonials-section');
   if (testimonialsSection) {
     attachParticles(testimonialsSection, testimonialsSection, '1');
@@ -927,21 +845,32 @@ function attachParticles(host, triggerEl, zIndex = '5') {
 
   const ctx = canvas.getContext('2d');
   let animationId = null;
+  let width = 0, height = 0;
 
+  // The bitmap follows the canvas's drawn size (hosts grow as their content loads), or the drawing stretches
   function resize() {
-    canvas.width = host.offsetWidth;
-    canvas.height = host.offsetHeight;
+    const dpr = window.devicePixelRatio || 1;
+    width = canvas.clientWidth;
+    height = canvas.clientHeight;
+    canvas.width = Math.round(width * dpr);
+    canvas.height = Math.round(height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
   resize();
-  window.addEventListener('resize', resize);
+  new ResizeObserver(resize).observe(host);
+
+  let rgb = accentRgb();
 
   triggerEl.addEventListener('mouseenter', () => {
     canvas.style.opacity = '1';
+    rgb = accentRgb();
     particles = [];
-    for (let i = 0; i < 40; i++) {
+    // Same density on every host: the research card's 40 particles over ~170,000 px²
+    const count = Math.min(220, Math.max(20, Math.round(width * height / 4200)));
+    for (let i = 0; i < count; i++) {
       particles.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
+        x: Math.random() * width,
+        y: Math.random() * height,
         vx: (Math.random() - 0.5) * 0.5,
         vy: (Math.random() - 0.5) * 0.5,
         size: Math.random() * 2 + 1
@@ -959,15 +888,15 @@ function attachParticles(host, triggerEl, zIndex = '5') {
   });
 
   function animate() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, width, height);
 
     particles.forEach(p => {
       p.x += p.vx;
       p.y += p.vy;
-      if (p.x < 0 || p.x > canvas.width)  p.vx *= -1;
-      if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+      if (p.x < 0 || p.x > width)  p.vx *= -1;
+      if (p.y < 0 || p.y > height) p.vy *= -1;
 
-      ctx.fillStyle = 'rgba(125, 211, 252, 0.6)';
+      ctx.fillStyle = `rgba(${rgb}, 0.6)`;
       ctx.beginPath();
       ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
       ctx.fill();
@@ -979,7 +908,7 @@ function attachParticles(host, triggerEl, zIndex = '5') {
         const dy = particles[i].y - particles[j].y;
         const dist = Math.sqrt(dx * dx + dy * dy);
         if (dist < 100) {
-          ctx.strokeStyle = `rgba(125, 211, 252, ${0.2 * (1 - dist / 100)})`;
+          ctx.strokeStyle = `rgba(${rgb}, ${0.2 * (1 - dist / 100)})`;
           ctx.lineWidth = 1;
           ctx.beginPath();
           ctx.moveTo(particles[i].x, particles[i].y);
@@ -992,6 +921,13 @@ function attachParticles(host, triggerEl, zIndex = '5') {
     animationId = requestAnimationFrame(animate);
   }
 }
+// The palette's accent as "r, g, b" for canvas drawing, which can't read CSS variables
+function accentRgb() {
+  const hex = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim().replace('#', '');
+  if (!/^[0-9a-f]{6}$/i.test(hex)) return '125, 211, 252';
+  return [0, 2, 4].map(i => parseInt(hex.slice(i, i + 2), 16)).join(', ');
+}
+
 // ─── Testimonials ────────────────────────────────────────────
 async function initTestimonials() {
   const section  = document.getElementById('testimonials-section');

@@ -3,31 +3,42 @@
   font-family: var(--font);
 }
 
-[data-theme="dark"], :root {
-  --bg:             #0f1724;
-  --bg-deep:        #071021;
-  --card:           #0b1220;
-  --container:      #17253c;
-  --glass:          rgba(255, 255, 255, 0.03);
-  --border:         rgba(255, 255, 255, 0.07);
-  --border-strong:  rgba(255, 255, 255, 0.14);
+/*
+ * Color tokens, after All-Space's palettes. These :root values are the default ("Midnight") palette and the
+ * first-paint fallback; settings.js overwrites the base tokens from the chosen palette. Only the base tokens change
+ * per palette: every accent shade below is mixed from --accent, so a palette swap recolors every glow and ring.
+ */
+:root {
+  /* Base tokens (set per palette in settings.js) */
+  --bg:             #121722;
+  --bg-deep:        #0c0f15;
+  --card:           #0e1116;
+  --container:      #1c2330;
+  --border:         #283041;
+  --border-strong:  #3a4150;
   --accent:         #7dd3fc;
-  --accent-glow:    rgba(125, 211, 252, 0.5);
-  --accent-dim:     rgba(125, 211, 252, 0.08);
-  --accent-mid:     rgba(125, 211, 252, 0.18);
-  --accent-ring:    rgba(125, 211, 252, 0.25);
-  --accent-border:  rgba(125, 211, 252, 0.28);
-  --accent-hover:   rgba(125, 211, 252, 0.55);
-  --text:           #e6eef6;
-  --text-soft:      #ccd8e4;
-  --muted:          #9aa4b2;
-  --shadow:         rgba(2, 6, 23, 0.6);
-  --shadow-deep:    rgba(2, 6, 23, 0.9);
-  --overlay:        rgba(0, 0, 0, 0.6);
-  --tooltip-bg:     rgba(20, 20, 20, 0.95);
+  --accent-contrast:#06121c;
+  --text:           #e8edf2;
+  --muted:          #8b97a6;
+  --shadow:         rgba(0, 0, 0, 0.45);
+  --overlay:        rgba(0, 0, 0, 0.55);
+  color-scheme: dark;
+
+  /* Derived tokens */
+  --glass:          color-mix(in srgb, var(--text) 3%, transparent);
+  --text-soft:      color-mix(in srgb, var(--text) 80%, var(--muted));
+  --shadow-deep:    color-mix(in srgb, var(--shadow) 100%, black 40%);
+  --accent-glow:    color-mix(in srgb, var(--accent) 50%, transparent);
+  --accent-dim:     color-mix(in srgb, var(--accent) 8%, transparent);
+  --accent-mid:     color-mix(in srgb, var(--accent) 18%, transparent);
+  --accent-ring:    color-mix(in srgb, var(--accent) 25%, transparent);
+  --accent-border:  color-mix(in srgb, var(--accent) 28%, transparent);
+  --accent-hover:   color-mix(in srgb, var(--accent) 55%, transparent);
+  --tooltip-bg:     color-mix(in srgb, var(--card) 95%, transparent);
   --badge-bg:       linear-gradient(135deg, #d1fae5, #bbf7d0);
   --badge-text:     #000;
-  --navbar-bg:      linear-gradient(180deg, #000 0%, rgba(0,0,0,0.8) 60%, transparent 100%);
+  --navbar-bg:      linear-gradient(180deg, var(--bg-deep) 0%, color-mix(in srgb, var(--bg-deep) 80%, transparent) 60%,
+                    transparent 100%);
 }
 
 * {
@@ -54,12 +65,15 @@ body {
   width: 100%;
 }
 
-*[title]:not([title=""]):not(iframe):not(svg) {
+/* The site's own tooltip reads data-tip; main.js moves an element's title there on first hover, so the browser's
+   tooltip never doubles it */
+*[title]:not([title=""]):not(iframe):not(svg),
+[data-tip]:not([data-tip=""]) {
   position: relative;
 }
 
-*[title]:not([title=""]):not(iframe):not(svg):hover::after {
-  content: attr(title);
+[data-tip]:not([data-tip=""]):hover::after {
+  content: attr(data-tip);
   position: absolute;
   bottom: 100%;
   left: 50%;
@@ -77,7 +91,7 @@ body {
   margin-bottom: 6px;
 }
 
-*[title]:not([title=""]):not(iframe):not(svg):hover::before {
+[data-tip]:not([data-tip=""]):hover::before {
   content: "";
   position: absolute;
   bottom: 100%;
@@ -162,8 +176,8 @@ body.custom-cursor-enabled * {
   z-index: 10000;
   transition: opacity 0.3s ease, width 0.2s ease, height 0.2s ease, border-width 0.2s ease;
   box-shadow: 0 0 10px var(--accent-glow),
-              0 0 20px rgba(125, 211, 252, 0.3),
-              inset 0 0 10px rgba(125, 211, 252, 0.2);
+              0 0 20px color-mix(in srgb, var(--accent) 30%, transparent),
+              inset 0 0 10px color-mix(in srgb, var(--accent) 20%, transparent);
   opacity: 0;
   transform: translate(-50%, -50%);
 }
@@ -172,9 +186,9 @@ body.custom-cursor-enabled * {
   width: 28px;
   height: 28px;
   border-width: 3px;
-  box-shadow: 0 0 15px rgba(125, 211, 252, 0.7),
-              0 0 30px rgba(125, 211, 252, 0.4),
-              inset 0 0 15px rgba(125, 211, 252, 0.3);
+  box-shadow: 0 0 15px color-mix(in srgb, var(--accent) 70%, transparent),
+              0 0 30px color-mix(in srgb, var(--accent) 40%, transparent),
+              inset 0 0 15px color-mix(in srgb, var(--accent) 30%, transparent);
 }
 
 .custom-cursor.active   { opacity: 1; }
@@ -182,9 +196,9 @@ body.custom-cursor-enabled * {
 .custom-cursor.clicking {
   width: 28px;
   height: 28px;
-  box-shadow: 0 0 20px rgba(125, 211, 252, 0.8),
-              0 0 40px rgba(125, 211, 252, 0.5),
-              inset 0 0 15px rgba(125, 211, 252, 0.4);
+  box-shadow: 0 0 20px color-mix(in srgb, var(--accent) 80%, transparent),
+              0 0 40px color-mix(in srgb, var(--accent) 50%, transparent),
+              inset 0 0 15px color-mix(in srgb, var(--accent) 40%, transparent);
 }
 
 .custom-cursor-dot {
@@ -210,7 +224,10 @@ body.custom-cursor-enabled * {
 }
 
 @keyframes rippleExpand {
-  0%   { width: 20px;  height: 20px;  opacity: 1; box-shadow: 0 0 10px rgba(125, 211, 252, 0.6); }
+  0% {
+    width: 20px;  height: 20px;  opacity: 1;
+    box-shadow: 0 0 10px color-mix(in srgb, var(--accent) 60%, transparent);
+  }
   100% { width: 100px; height: 100px; opacity: 0; box-shadow: 0 0 30px transparent; }
 }
 
@@ -326,16 +343,6 @@ main.hidden { opacity: 0; }
 .nav-links a:hover::after,
 .nav-links a.active::after   { transform: scaleX(1); opacity: 1; }
 
-section {
-  transform: translateY(0);
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-section.hidden {
-  opacity: 0;
-  transform: translateY(20px);
-}
-
 #main-content {
   width: 100%;
   max-width: 100%;
@@ -345,7 +352,11 @@ section.hidden {
 #main-content > section {
   width: 100%;
   max-width: 100%;
+  scroll-margin-top: var(--nav-h, 0px);
 }
+
+/* Room between sections, more than the contact card's tilted corner reaches (about 20 px) */
+#main-content > section + section { margin-top: 2rem; }
 
 .popup {
   position: fixed;

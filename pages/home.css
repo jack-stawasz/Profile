@@ -43,25 +43,26 @@
   height: 100%;
 }
 
-.overlay-text {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  color: #fff;
-  font-size: clamp(18px, 4vw, 28px);
-  font-weight: 500;
-  white-space: nowrap;
-  pointer-events: none;
-  z-index: 1;
-  text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+/* The typed intro line leading into Current Research; its height is fixed so typing never shifts the page */
+.typed-intro {
+  margin: 0 0 -0.75rem;
+  min-height: 1.4em;
+  color: var(--text);
   font-family: 'Courier New', 'Consolas', 'Monaco', monospace;
+  font-size: clamp(18px, 3vw, 24px);
+  font-weight: 500;
+  line-height: 1.4;
+  white-space: nowrap;
 }
 
-.overlay-text::after {
+.typed-intro::after {
   content: '|';
+  margin-left: 1px;
+  color: var(--accent);
   animation: blink 1s infinite;
 }
+
+body.no-animations .typed-intro::after { animation: none; }
 
 @keyframes blink {
   0%, 50%   { opacity: 1; }
@@ -231,12 +232,13 @@
   box-sizing: border-box;
   border-radius: 12px;
   border: 1px solid transparent;
+  background: color-mix(in srgb, var(--accent) 2%, transparent);
   transition: border-color 0.3s ease, background 0.3s ease;
 }
 
 .skill-slide:hover {
   border-color: var(--accent-dim);
-  background: rgba(125,211,252,0.03);
+  background: color-mix(in srgb, var(--accent) 3%, transparent);
 }
 
 @media (min-width: 768px)  { .skill-slide { width: 50vw; } }
@@ -252,28 +254,10 @@
   object-position: center;
   z-index: 0;
   opacity: 0.5;
-  transition: all 0.3s ease;
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
 .skill-slide:hover .skill-image { opacity: 0.65; transform: scale(1.05); }
-
-.skill-icon-large {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 8rem;
-  background: var(--accent-dim);
-  z-index: 0;
-  opacity: 0.2;
-  transition: all 0.3s ease;
-}
-
-.skill-slide:hover .skill-icon-large { opacity: 0.3; transform: scale(1.1); }
 
 .skill-name {
   font-size: 1.8rem;
@@ -408,7 +392,8 @@
 .testimonial-card {
   flex-shrink: 0;
   width: clamp(260px, 32vw, 360px);
-  background: linear-gradient(160deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
+  /* Opaque underneath, so the section's particles pass under the cards instead of showing through */
+  background: linear-gradient(160deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%), var(--container);
   border: 1px solid var(--accent-dim);
   border-radius: 14px;
   padding: 1.4rem 1.5rem 1.25rem;
@@ -584,7 +569,7 @@
 
 .testimonials-scrubber::-webkit-slider-thumb:hover {
   transform: scale(1.3);
-  box-shadow: 0 0 14px rgba(125,211,252,0.7);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 70%, transparent);
 }
 
 .testimonials-scrubber::-moz-range-thumb {
