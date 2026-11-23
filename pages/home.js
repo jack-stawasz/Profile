@@ -97,8 +97,7 @@ async function initHome() {
   }
   
   const ctx = canvas.getContext("2d");
-  const path = document.getElementById("svgPath");
-  if (!path) return;
+  if (typeof SIGNATURE_FOURIER === 'undefined') return;
 
   const controller = {
     isRunning: true,
@@ -135,7 +134,7 @@ async function initHome() {
   document.querySelectorAll('.popup').forEach(p =>
     popupWatch.observe(p, { attributes: true, attributeFilter: ['class'] }));
 
-  let displayWidth, displayHeight, CENTER_X, CENTER_Y, signal, fourier, nova;
+  let displayWidth, displayHeight, CENTER_X, CENTER_Y, fourier, nova;
 
   function setupCanvas() {
     const container = canvas.parentElement;
@@ -150,23 +149,18 @@ async function initHome() {
     CENTER_X = displayWidth / 3;
     CENTER_Y = displayHeight / 2;
 
-    const SAMPLE_COUNT = 600;
-    signal = sampleSVG(path, SAMPLE_COUNT);
-    const MAX_TERMS = 800;
-    const half = Math.floor(MAX_TERMS / 2);
-    fourier = dft(signal).filter(f =>
-      f.freq <= half || f.freq >= signal.length - half
-    );
+    // The terms are precomputed in path units (pages/banner/signature-fourier.js); the path is 11 units tall
+    const SCALE = displayHeight / 11 * 0.6;
+    fourier = SIGNATURE_FOURIER.terms.map(([freq, amp, phase]) => ({ freq, amp: amp * SCALE, phase }));
 
     // Neutrino vertices land outside the signature, with room for a vertex's hadron blob; tracks still cross it
     const VERTEX_CLEARANCE = 40;
-    const xs = signal.map(p => p.re);
-    const ys = signal.map(p => p.im);
+    const b = SIGNATURE_FOURIER.bounds;
     nova.avoid({
-      x0: CENTER_X + Math.min(...xs) - VERTEX_CLEARANCE,
-      x1: CENTER_X + Math.max(...xs) + VERTEX_CLEARANCE,
-      y0: CENTER_Y + Math.min(...ys) - VERTEX_CLEARANCE,
-      y1: CENTER_Y + Math.max(...ys) + VERTEX_CLEARANCE,
+      x0: CENTER_X + b.x0 * SCALE - VERTEX_CLEARANCE,
+      x1: CENTER_X + b.x1 * SCALE + VERTEX_CLEARANCE,
+      y0: CENTER_Y + b.y0 * SCALE - VERTEX_CLEARANCE,
+      y1: CENTER_Y + b.y1 * SCALE + VERTEX_CLEARANCE,
     });
   }
 
@@ -188,48 +182,13 @@ async function initHome() {
   let time = 0;
   let trace = [];
 
-  function sampleSVG(path, N) {
-    const len = path.getTotalLength();
-    const pts = [];
-    for (let i = 0; i < N; i++) {
-      const p = path.getPointAtLength((i / N) * len);
-      pts.push({ x: p.x, y: p.y });
-    }
-    const mx = pts.reduce((s, p) => s + p.x, 0) / N;
-    const my = pts.reduce((s, p) => s + p.y, 0) / N;
-    const SCALE_FACTOR = displayHeight / 11 * 0.6;
-    return pts.map(p => ({ re: (p.x - mx) * SCALE_FACTOR, im: (p.y - my) * SCALE_FACTOR }));
-  }
-
-  function dft(signal) {
-    const X = [];
-    const N = signal.length;
-    for (let k = 0; k < N; k++) {
-      let re = 0, im = 0;
-      for (let n = 0; n < N; n++) {
-        const phi = (2 * Math.PI * k * n) / N;
-        re += signal[n].re * Math.cos(phi) + signal[n].im * Math.sin(phi);
-        im += -signal[n].re * Math.sin(phi) + signal[n].im * Math.cos(phi);
-      }
-      re /= N;
-      im /= N;
-      X.push({
-        freq: k,
-        amp: Math.hypot(re, im),
-        phase: Math.atan2(im, re)
-      });
-    }
-    return X.sort((a, b) => b.amp - a.amp);
-  }
-
   // The arm is a debug view; the trace only needs the arm's end point
-  function drawEpicycles(x, y, fourier, signal) {
+  function drawEpicycles(x, y, fourier) {
     const showArm = Boolean(window.SiteSettings && window.SiteSettings.debugMode);
     for (const f of fourier) {
       const px = x;
       const py = y;
-      const k = (f.freq > signal.length / 2) ? f.freq - signal.length : f.freq;
-      const angle = k * time + f.phase;
+      const angle = f.freq * time + f.phase;
       x += f.amp * Math.cos(angle);
       y += f.amp * Math.sin(angle);
       if (!showArm) continue;
@@ -336,7 +295,7 @@ async function initHome() {
     nova.draw(ctx, now);
     drawHalo();
 
-    const v = drawEpicycles(CENTER_X, CENTER_Y, fourier, signal);
+    const v = drawEpicycles(CENTER_X, CENTER_Y, fourier);
 
     if (!isSettled) {
       if (settleStart === null) settleStart = now;
