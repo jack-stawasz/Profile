@@ -147,20 +147,25 @@
       btn.setAttribute('role', 'radio');
       btn.dataset.palette = id;
 
-      // A miniature of the palette: page, a card on it, and the accent
+      // A miniature of the palette: a nav strip, the page, and a card with a heading in the accent and body text
       const c = p.colors;
       const preview = el('span', 'settings-swatch-preview');
       preview.style.background = `linear-gradient(180deg, ${c['--bg']}, ${c['--bg-deep']})`;
       preview.style.borderColor = c['--border'];
+      const nav = el('span', 'settings-swatch-nav');
+      nav.style.background = c['--card'];
+      nav.style.borderColor = c['--border'];
       const card = el('span', 'settings-swatch-card');
       card.style.background = c['--container'];
       card.style.borderColor = c['--border-strong'];
-      const line = el('span', 'settings-swatch-line');
-      line.style.background = c['--muted'];
-      const dot = el('span', 'settings-swatch-accent');
-      dot.style.background = c['--accent'];
-      card.append(dot, line);
-      preview.appendChild(card);
+      const heading = el('span', 'settings-swatch-heading');
+      heading.style.background = c['--accent'];
+      const text = el('span', 'settings-swatch-text');
+      text.style.background = c['--text'];
+      const textShort = el('span', 'settings-swatch-text short');
+      textShort.style.background = c['--muted'];
+      card.append(heading, text, textShort);
+      preview.append(nav, card);
 
       btn.append(preview, el('span', 'settings-swatch-label', p.label));
       btn.addEventListener('click', () => {
@@ -266,7 +271,7 @@
           applyAnimations(on);
           if (window._applyBannerState) window._applyBannerState(on);
         }), { forId: 'settings-anim' }),
-      row('Debug mode', "Shows the Fourier arm drawing the home banner's trace", buildToggle('settings-debug', 'debug'),
+      row('Debug mode', 'Display developer-only tools', buildToggle('settings-debug', 'debug'),
         { forId: 'settings-debug' }),
     );
 

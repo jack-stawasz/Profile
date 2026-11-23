@@ -42,7 +42,6 @@
   justify-content: center;
   padding: 24px;
   background: var(--overlay);
-  backdrop-filter: blur(4px);
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.18s ease, visibility 0s linear 0.18s;
@@ -172,66 +171,69 @@
   gap: 10px;
 }
 
+/* The miniature is the tile: no frame around it, and the open palette gets an accent ring */
 .settings-swatch {
   display: flex;
   flex-direction: column;
   gap: 7px;
-  padding: 6px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
+  padding: 0;
+  border: 0;
   background: transparent;
   color: var(--muted);
   font: inherit;
   cursor: pointer;
-  transition: border-color 0.15s ease, color 0.15s ease;
+  transition: color 0.15s ease;
 }
 
-.settings-swatch:hover { border-color: var(--border-strong); color: var(--text); }
+.settings-swatch:hover        { color: var(--text); }
+.settings-swatch.active       { color: var(--accent); }
 
-.settings-swatch.active {
-  border-color: var(--accent);
-  color: var(--accent);
-  box-shadow: 0 0 0 1px var(--accent);
-}
-
-/* The miniature keeps one shape at every width: everything inside is placed by percentage */
+/* Everything inside the miniature is placed by percentage, so it keeps one shape at every width */
 .settings-swatch-preview {
   position: relative;
   display: block;
   aspect-ratio: 8 / 5;
   border: 1px solid;
-  border-radius: 6px;
+  border-radius: 8px;
   overflow: hidden;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.settings-swatch:hover .settings-swatch-preview  { transform: translateY(-2px); }
+.settings-swatch.active .settings-swatch-preview { box-shadow: 0 0 0 2px var(--container), 0 0 0 4px var(--accent); }
+.settings-dialog .settings-swatch:focus-visible  { outline: none; }
+.settings-swatch:focus-visible .settings-swatch-preview {
+  box-shadow: 0 0 0 2px var(--container), 0 0 0 4px var(--accent-ring);
+}
+
+.settings-swatch-nav {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 18%;
+  border-bottom: 1px solid;
 }
 
 .settings-swatch-card {
   position: absolute;
-  left: 14%;
-  right: 14%;
-  top: 34%;
-  bottom: -1px;
-  border: 1px solid;
-  border-radius: 5px 5px 0 0;
-}
-
-.settings-swatch-accent {
-  position: absolute;
-  top: 22%;
-  left: 10%;
-  width: 11%;
-  aspect-ratio: 1;
-  border-radius: 50%;
-}
-
-.settings-swatch-line {
-  position: absolute;
-  top: 29%;
-  left: 28%;
+  left: 12%;
   right: 12%;
-  height: 9%;
-  border-radius: 999px;
-  opacity: 0.6;
+  top: 32%;
+  bottom: 14%;
+  border: 1px solid;
+  border-radius: 4px;
 }
+
+.settings-swatch-heading,
+.settings-swatch-text {
+  position: absolute;
+  left: 12%;
+  height: 11%;
+  border-radius: 999px;
+}
+
+.settings-swatch-heading      { top: 18%; width: 40%; height: 14%; }
+.settings-swatch-text         { top: 46%; width: 72%; opacity: 0.55; }
+.settings-swatch-text.short   { top: 68%; width: 50%; opacity: 0.7; }
 
 .settings-swatch-label {
   font-size: 0.78rem;

@@ -113,8 +113,9 @@ async function initHome() {
   
   homeAnimationController = controller;
 
-  // The banner sleeps while it is scrolled out of view or a popup covers the page, and wakes when neither holds
-  const popupOpen = () => document.querySelector('.popup:not(.hidden)') !== null;
+  // The banner sleeps while it is scrolled out of view or a popup or the settings dialog covers the page, and wakes
+  // when none of these holds
+  const popupOpen = () => document.querySelector('.popup:not(.hidden), .settings-overlay.open') !== null;
   controller.offscreen = false;
   controller.sleeping = false;
   controller.wake = function() {
@@ -127,7 +128,7 @@ async function initHome() {
     controller.wake();
   }).observe(canvas);
   const popupWatch = new MutationObserver(() => controller.wake());
-  document.querySelectorAll('.popup').forEach(p =>
+  document.querySelectorAll('.popup, .settings-overlay').forEach(p =>
     popupWatch.observe(p, { attributes: true, attributeFilter: ['class'] }));
 
   let displayWidth, displayHeight, CENTER_X, CENTER_Y, fourier, nova;
