@@ -20,15 +20,6 @@
       </svg>
       Education
     </button>
-    <button class="exp-tab" data-tab="research">
-      <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true">
-        <circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor"/>
-        <line x1="9.9" y1="9.9" x2="13.5" y2="13.5" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"/>
-        <line x1="6.5" y1="4" x2="6.5" y2="9" stroke="currentColor" stroke-linecap="round"/>
-        <line x1="4" y1="6.5" x2="9" y2="6.5" stroke="currentColor" stroke-linecap="round"/>
-      </svg>
-      Research
-    </button>
     <div class="exp-ink" aria-hidden="true"></div>
   </nav>
   </div>
@@ -194,87 +185,6 @@
     </header>
     <div id="edu-status" class="exp-status loading" role="status">Loading courses…</div>
     <div id="edu-content" class="exp-edu-content" hidden></div>
-  </div>
-
-  <!-- ── Research panel ─────────────────────────────────── -->
-  <div class="exp-panel" id="exp-panel-research" hidden>
-    <header class="exp-header">
-      <div class="exp-header-left">
-        <div class="exp-header-text">
-          <h1>Research</h1>
-          <p class="muted">Fetched from <code>research.json</code></p>
-        </div>
-        <svg class="exp-logo" aria-hidden="true"><use href="#logo"></use></svg>
-      </div>
-      <div class="exp-controls">
-        <input class="exp-search" id="res-q" placeholder="Search research…" aria-label="Search research"/>
-        <div class="exp-control-buttons">
-
-          <!-- View toggle -->
-          <div class="exp-dropdown-wrap">
-            <button id="res-view-btn" class="exp-ctrl-btn" type="button" title="View mode">👁</button>
-            <div id="res-view-drop" class="exp-dropdown" hidden>
-              <p class="exp-drop-title">Display Mode</p>
-              <label class="exp-drop-option">
-                <input type="radio" name="res-view" value="card" checked/> Card View
-              </label>
-              <label class="exp-drop-option">
-                <input type="radio" name="res-view" value="list"/> List View
-              </label>
-            </div>
-          </div>
-
-          <!-- Sort toggle -->
-          <div class="exp-dropdown-wrap">
-            <button id="res-sort-btn" class="exp-ctrl-btn" type="button" title="Sort">≡↑</button>
-            <div id="res-sort-drop" class="exp-dropdown exp-sort-drop" hidden>
-              <p class="exp-drop-title">
-                Sort Priority
-                <button id="res-reverse-btn" class="exp-reverse-btn" title="Reverse order">⇅</button>
-              </p>
-              <div id="res-sort-chips" class="exp-sort-chips">
-                <div class="exp-sort-chip" draggable="true" data-sort="title">
-                  <span class="exp-drag-handle">⠿</span><span>Title</span>
-                </div>
-                <div class="exp-sort-chip" draggable="true" data-sort="organization">
-                  <span class="exp-drag-handle">⠿</span><span>Organization</span>
-                </div>
-                <div class="exp-sort-chip" draggable="true" data-sort="year">
-                  <span class="exp-drag-handle">⠿</span><span>Year</span>
-                </div>
-                <div class="exp-sort-chip" draggable="true" data-sort="field">
-                  <span class="exp-drag-handle">⠿</span><span>Field</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Filter toggle -->
-          <div class="exp-dropdown-wrap">
-            <button id="res-filter-btn" class="exp-ctrl-btn" type="button" title="Filter">
-              <svg width="20" height="16" viewBox="0 0 20 16" fill="none" aria-hidden="true">
-                <rect width="20" height="2" rx="1" fill="currentColor"/>
-                <rect y="7"  width="14" height="2" rx="1" fill="currentColor"/>
-                <rect y="14" width="8"  height="2" rx="1" fill="currentColor"/>
-              </svg>
-            </button>
-            <div id="res-filter-drop" class="exp-dropdown exp-filter-drop" hidden>
-              <p class="exp-drop-title">Organizations</p>
-              <div id="res-org-filters" class="exp-filter-options"></div>
-              <p class="exp-drop-title" style="margin-top:10px">Fields</p>
-              <div id="res-field-filters" class="exp-filter-options"></div>
-              <div class="exp-filter-actions">
-                <button id="res-clear-btn" class="exp-filter-btn">Clear All</button>
-                <button id="res-apply-btn" class="exp-filter-btn primary">Apply</button>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </header>
-    <div id="res-status" class="exp-status loading" role="status">Loading research…</div>
-    <div id="res-content" class="exp-edu-content" hidden></div>
   </div>
 
 </div>

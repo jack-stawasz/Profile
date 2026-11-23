@@ -104,6 +104,47 @@ tbPopup.querySelector('.close').addEventListener('click', closeTextbookPopup);
 tbPopup.addEventListener('click', e => { if (e.target === tbPopup) closeTextbookPopup(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && !tbPopup.classList.contains('hidden')) closeTextbookPopup(); });
 
+// Toolbar dropdowns (allspace I19): hovering a button shows its dropdown with a short fade, and leaving hides it at
+// once. A click pins it open, with no fade, until the button is clicked again or the click lands outside. Using a
+// hovered dropdown pins it too, so a drag or a select's popup can't take it away mid-choice.
+function wireDropdowns(pairs, signal) {
+  const canHover = window.matchMedia('(hover: hover)').matches;
+  let pinned = null;
+  const show = (drop, fade) => {
+    drop.classList.toggle('fade-in', fade);
+    drop.hidden = false;
+  };
+  const closeAll = () => {
+    pinned = null;
+    pairs.forEach(([, drop]) => { drop.hidden = true; });
+  };
+  pairs.forEach(([btn, drop]) => {
+    const wrap = btn.parentElement;
+    if (canHover) {
+      // A pinned dropdown owns the toolbar, so hovering another button shows nothing over it
+      wrap.addEventListener('mouseenter', () => { if (!pinned) show(drop, true); }, { signal });
+      wrap.addEventListener('mouseleave', () => { if (pinned !== drop) drop.hidden = true; }, { signal });
+      drop.addEventListener('pointerdown', () => {
+        if (pinned) return;
+        pinned = drop;
+        drop.classList.remove('fade-in');
+      }, { signal });
+    }
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const wasPinned = pinned === drop;
+      closeAll();
+      if (wasPinned) return;
+      pinned = drop;
+      show(drop, false);
+    }, { signal });
+  });
+  document.addEventListener('click', e => {
+    if (!pairs.some(([btn, drop]) => btn.contains(e.target) || drop.contains(e.target))) closeAll();
+  }, { signal });
+  return closeAll;
+}
+
 function initExpLogoSpin() {
   const ENTER_RADIUS = 70;
   const EXIT_RADIUS  = 120;
@@ -157,15 +198,6 @@ let projReverseSort = false;
 let projViewMode    = 'card';
 let projFilters     = { organizations: new Set() };
 
-let _resAbortController = null;
-let resItems       = [];
-let resOrgs        = new Set();
-let resFields      = new Set();
-let resSortOrder   = ['title', 'organization', 'year', 'field'];
-let resReverseSort = false;
-let resViewMode    = 'card';
-let resFilters     = { organizations: new Set(), fields: new Set() };
-
 function initExperience() {
   initExpLogoSpin();
   const tabs   = document.querySelectorAll('.exp-tab');
@@ -173,13 +205,11 @@ function initExperience() {
   const panels = {
     projects:  document.getElementById('exp-panel-projects'),
     education: document.getElementById('exp-panel-education'),
-    research:  document.getElementById('exp-panel-research'),
   };
 
   let activeTab   = 'projects';
   let projInited  = false;
   let eduInited   = false;
-  let resInited   = false;
 
   function positionInk(tabEl) {
     if (!inkEl || !tabEl) return;
@@ -200,10 +230,6 @@ function initExperience() {
     if (name === 'education' && !eduInited) {
       eduInited = true;
       initEducationPanel();
-    }
-    if (name === 'research' && !resInited) {
-      resInited = true;
-      initResearchPanel();
     }
   }
 
@@ -547,31 +573,10 @@ function initProjectsPanel() {
     renderProjects(filterAndSort());
   }
 
-  // Dropdown helpers
-  function closeAllDropdowns() {
-    viewDrop.hidden = true;
-    sortDrop.hidden = true;
-    filterDrop.hidden = true;
-  }
-
-  function toggleDropdown(target) {
-    const wasHidden = target.hidden;
-    closeAllDropdowns();
-    target.hidden = !wasHidden;
-  }
-
-  viewBtn.addEventListener('click',   e => { e.stopPropagation(); toggleDropdown(viewDrop); });
-  sortBtn.addEventListener('click',   e => { e.stopPropagation(); toggleDropdown(sortDrop); });
-  filterBtn.addEventListener('click', e => { e.stopPropagation(); toggleDropdown(filterDrop); });
-
-  document.addEventListener('click', e => {
-    if (!viewBtn.contains(e.target)   && !viewDrop.contains(e.target))   viewDrop.hidden   = true;
-    if (!sortBtn.contains(e.target)   && !sortDrop.contains(e.target))   sortDrop.hidden   = true;
-    if (!filterBtn.contains(e.target) && !filterDrop.contains(e.target)) filterDrop.hidden = true;
-  }, { signal });
+  const closeDropdowns = wireDropdowns([[viewBtn, viewDrop], [sortBtn, sortDrop], [filterBtn, filterDrop]], signal);
 
   document.querySelectorAll('input[name="proj-view"]').forEach(r => {
-    r.addEventListener('change', e => { projViewMode = e.target.value; viewDrop.hidden = true; updateDisplay(); });
+    r.addEventListener('change', e => { projViewMode = e.target.value; closeDropdowns(); updateDisplay(); });
   });
 
   reverseBtn.addEventListener('click', () => {
@@ -920,30 +925,10 @@ function initEducationPanel() {
     makeDragAndDrop('edu-sort-chips', order => { eduSortOrder = order; updateDisplay(); });
   }
 
-  function closeAllDropdowns() {
-    viewDrop.hidden   = true;
-    sortDrop.hidden   = true;
-    filterDrop.hidden = true;
-  }
-
-  function toggleDropdown(target) {
-    const wasHidden = target.hidden;
-    closeAllDropdowns();
-    target.hidden = !wasHidden;
-  }
-
-  viewBtn.addEventListener('click',   e => { e.stopPropagation(); toggleDropdown(viewDrop); });
-  sortBtn.addEventListener('click',   e => { e.stopPropagation(); toggleDropdown(sortDrop); });
-  filterBtn.addEventListener('click', e => { e.stopPropagation(); toggleDropdown(filterDrop); });
-
-  document.addEventListener('click', e => {
-    if (!viewBtn.contains(e.target)   && !viewDrop.contains(e.target))   viewDrop.hidden   = true;
-    if (!sortBtn.contains(e.target)   && !sortDrop.contains(e.target))   sortDrop.hidden   = true;
-    if (!filterBtn.contains(e.target) && !filterDrop.contains(e.target)) filterDrop.hidden = true;
-  }, { signal });
+  const closeDropdowns = wireDropdowns([[viewBtn, viewDrop], [sortBtn, sortDrop], [filterBtn, filterDrop]], signal);
 
   document.querySelectorAll('input[name="edu-view"]').forEach(r => {
-    r.addEventListener('change', e => { eduViewMode = e.target.value; viewDrop.hidden = true; updateDisplay(); });
+    r.addEventListener('change', e => { eduViewMode = e.target.value; closeDropdowns(); updateDisplay(); });
   });
 
   reverseBtn.addEventListener('click', () => {
@@ -972,320 +957,4 @@ function initEducationPanel() {
   qEl.addEventListener('input', filterCourses);
 
   fetchEducation();
-}
-
-/* ═══════════════════════════════════════════════════════════
-═══════════════════════════════════════════════════════════ */
-function initResearchPanel() {
-  const RES_JSON = './data/research.json';
-
-  if (_resAbortController) _resAbortController.abort();
-  _resAbortController = new AbortController();
-  const { signal } = _resAbortController;
-
-  resItems        = [];
-  resOrgs         = new Set();
-  resFields       = new Set();
-  resSortOrder    = ['title', 'organization', 'year', 'field'];
-  resReverseSort  = false;
-  resViewMode     = 'card';
-  resFilters      = { organizations: new Set(), fields: new Set() };
-
-  const statusEl   = document.getElementById('res-status');
-  const contentEl  = document.getElementById('res-content');
-  const qEl        = document.getElementById('res-q');
-  const viewBtn    = document.getElementById('res-view-btn');
-  const viewDrop   = document.getElementById('res-view-drop');
-  const sortBtn    = document.getElementById('res-sort-btn');
-  const sortDrop   = document.getElementById('res-sort-drop');
-  const filterBtn  = document.getElementById('res-filter-btn');
-  const filterDrop = document.getElementById('res-filter-drop');
-  const reverseBtn = document.getElementById('res-reverse-btn');
-  const clearBtn   = document.getElementById('res-clear-btn');
-  const applyBtn   = document.getElementById('res-apply-btn');
-
-  function showStatus(msg, type = 'loading', retry = false) {
-    statusEl.className = `exp-status ${type}`;
-    statusEl.innerHTML = '';
-    const t = document.createElement('div');
-    t.textContent = msg;
-    statusEl.appendChild(t);
-    if (retry) {
-      const btn = document.createElement('button');
-      btn.className = 'exp-retry-btn';
-      btn.textContent = 'Retry';
-      btn.onclick = fetchResearch;
-      statusEl.appendChild(btn);
-    }
-    statusEl.hidden = false;
-    contentEl.hidden = true;
-  }
-
-  function clearStatus() {
-    statusEl.hidden = true;
-    contentEl.hidden = false;
-  }
-
-  async function fetchResearch() {
-    showStatus('Loading research…');
-    try {
-      const res = await fetch(RES_JSON, { cache: 'no-store' });
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      const data = await res.json();
-      if (!Array.isArray(data)) throw new Error('Expected an array of research items.');
-
-      resItems = data;
-      resOrgs.clear();
-      resFields.clear();
-      resItems.forEach(r => {
-        if (r.organization) resOrgs.add(r.organization);
-        if (r.field) resFields.add(r.field);
-      });
-
-      populateFilters();
-      updateDisplay();
-      setTimeout(() => makeDragAndDrop('res-sort-chips', order => { resSortOrder = order; updateDisplay(); }), 80);
-    } catch (err) {
-      console.error(err);
-      showStatus('Failed to load research. ' + err.message, 'error', true);
-    }
-  }
-
-  function populateFilters() {
-    const orgEl   = document.getElementById('res-org-filters');
-    const fieldEl = document.getElementById('res-field-filters');
-    orgEl.innerHTML   = '';
-    fieldEl.innerHTML = '';
-    [...resOrgs].sort().forEach(v  => orgEl.appendChild(makeFilterOption('org',   v)));
-    [...resFields].sort().forEach(v => fieldEl.appendChild(makeFilterOption('field', v)));
-  }
-
-  function makeFilterOption(type, value) {
-    const wrap = document.createElement('div');
-    wrap.className = 'exp-filter-option';
-    const cb = document.createElement('input');
-    cb.type = 'checkbox';
-    cb.id = `res-filter-${type}-${value.replace(/\s+/g, '-')}`;
-    cb.value = value;
-    cb.dataset.type = type;
-    const lbl = document.createElement('label');
-    lbl.htmlFor = cb.id;
-    lbl.textContent = value;
-    wrap.appendChild(cb);
-    wrap.appendChild(lbl);
-    return wrap;
-  }
-
-  function filterAndSort() {
-    const q = (qEl.value || '').trim().toLowerCase();
-
-    let filtered = resItems.filter(r => {
-      const matchQ = !q ||
-        (r.title || '').toLowerCase().includes(q) ||
-        (r.description || '').toLowerCase().includes(q) ||
-        (r.organization || '').toLowerCase().includes(q) ||
-        (r.field || '').toLowerCase().includes(q) ||
-        (r.tags || []).some(t => t.toLowerCase().includes(q));
-      const matchO = resFilters.organizations.size === 0 || resFilters.organizations.has(r.organization);
-      const matchF = resFilters.fields.size === 0 || resFilters.fields.has(r.field);
-      return matchQ && matchO && matchF;
-    });
-
-    filtered = [...filtered].sort((a, b) => {
-      for (const crit of resSortOrder) {
-        let cmp = 0;
-        if (crit === 'title')        cmp = (a.title || '').localeCompare(b.title || '');
-        else if (crit === 'organization') cmp = (a.organization || '').localeCompare(b.organization || '');
-        else if (crit === 'year')    cmp = (a.year || 0) - (b.year || 0);
-        else if (crit === 'field')   cmp = (a.field || '').localeCompare(b.field || '');
-        if (cmp !== 0) return resReverseSort ? -cmp : cmp;
-      }
-      return 0;
-    });
-
-    return filtered;
-  }
-
-  function renderResearch(items) {
-    contentEl.innerHTML = '';
-    if (!items.length) { showStatus('No research items found.', 'empty'); return; }
-    clearStatus();
-
-    contentEl.classList.toggle('list-view', resViewMode === 'list');
-
-    if (resViewMode === 'list') renderListView(items);
-    else renderCardView(items);
-  }
-
-  function renderListView(items) {
-    items.forEach(r => {
-      if (!r.title) return;
-      const el = document.createElement('div');
-      el.className = 'course-list-item';
-      el.dataset.title = (r.title || '').toLowerCase();
-      el.dataset.organization = (r.organization || '').toLowerCase();
-      el.dataset.field = (r.field || '').toLowerCase();
-
-      const inner = document.createElement('span');
-      inner.textContent = r.title;
-      el.appendChild(inner);
-
-      contentEl.appendChild(el);
-    });
-  }
-
-  function renderCardView(items) {
-    items.forEach(r => {
-      if (!r.title) return;
-
-      const card = document.createElement('article');
-      card.className = 'project-card';
-      card.dataset.title = (r.title || '').toLowerCase();
-      card.dataset.organization = (r.organization || '').toLowerCase();
-      card.dataset.field = (r.field || '').toLowerCase();
-
-      if (r.organization) {
-        const org = document.createElement('div');
-        org.className = 'organization';
-        org.textContent = r.organization;
-        card.appendChild(org);
-      }
-
-      const thumb = document.createElement('div');
-      thumb.className = 'project-thumb';
-      thumb.style.background = 'linear-gradient(135deg, #6366f1, #4338ca)';
-      thumb.style.color = '#e0e7ff';
-      if (r.thumbnail) {
-        thumb.style.background = `url(${r.thumbnail}) center/cover`;
-        thumb.style.color = '';
-      } else {
-        thumb.textContent = (r.title || 'R').trim().slice(0, 2).toUpperCase();
-      }
-
-      const meta = document.createElement('div');
-      meta.className = 'project-meta';
-
-      const title = document.createElement('h2');
-      title.className = 'project-title';
-      title.textContent = r.title || 'Untitled';
-      meta.appendChild(title);
-
-      if (r.description) {
-        const desc = document.createElement('p');
-        desc.className = 'project-desc';
-        desc.textContent = r.description;
-        meta.appendChild(desc);
-      }
-
-      // Tags row
-      const tagsAndLinks = document.createElement('div');
-      tagsAndLinks.className = 'project-meta-row';
-      tagsAndLinks.style.marginTop = '8px';
-
-      const tags = document.createElement('div');
-      tags.className = 'project-tags';
-      if (r.field) {
-        const s = document.createElement('span');
-        s.className = 'project-tag';
-        s.textContent = r.field;
-        tags.appendChild(s);
-      }
-      if (r.year) {
-        const s = document.createElement('span');
-        s.className = 'project-tag';
-        s.textContent = r.year;
-        tags.appendChild(s);
-      }
-      (r.tags || []).forEach(t => {
-        const s = document.createElement('span');
-        s.className = 'project-tag';
-        s.textContent = t;
-        tags.appendChild(s);
-      });
-
-      const links = document.createElement('div');
-      links.className = 'project-links';
-
-      if (r.url) {
-        const a = document.createElement('a');
-        a.href = '#';
-        a.className = 'project-link';
-        a.innerHTML = '🔗 View Research';
-        a.addEventListener('click', e => { e.preventDefault(); openPopup(r.url); });
-        links.appendChild(a);
-      }
-      if (r.repo) {
-        const a = document.createElement('a');
-        a.href = r.repo;
-        a.className = 'project-link';
-        a.innerHTML = '📦 Repository';
-        a.addEventListener('click', e => { e.preventDefault(); window.open(r.repo, '_blank', 'noopener,noreferrer'); });
-        links.appendChild(a);
-      }
-
-      if (tags.children.length) tagsAndLinks.appendChild(tags);
-      if (links.children.length) tagsAndLinks.appendChild(links);
-      if (tagsAndLinks.children.length) meta.appendChild(tagsAndLinks);
-
-      card.appendChild(thumb);
-      card.appendChild(meta);
-      contentEl.appendChild(card);
-    });
-  }
-
-  function updateDisplay() { renderResearch(filterAndSort()); }
-
-  // Dropdown helpers
-  function closeAllDropdowns() {
-    viewDrop.hidden   = true;
-    sortDrop.hidden   = true;
-    filterDrop.hidden = true;
-  }
-
-  function toggleDropdown(target) {
-    const wasHidden = target.hidden;
-    closeAllDropdowns();
-    target.hidden = !wasHidden;
-  }
-
-  viewBtn.addEventListener('click',   e => { e.stopPropagation(); toggleDropdown(viewDrop); });
-  sortBtn.addEventListener('click',   e => { e.stopPropagation(); toggleDropdown(sortDrop); });
-  filterBtn.addEventListener('click', e => { e.stopPropagation(); toggleDropdown(filterDrop); });
-
-  document.addEventListener('click', e => {
-    if (!viewBtn.contains(e.target)   && !viewDrop.contains(e.target))   viewDrop.hidden   = true;
-    if (!sortBtn.contains(e.target)   && !sortDrop.contains(e.target))   sortDrop.hidden   = true;
-    if (!filterBtn.contains(e.target) && !filterDrop.contains(e.target)) filterDrop.hidden = true;
-  }, { signal });
-
-  document.querySelectorAll('input[name="res-view"]').forEach(r => {
-    r.addEventListener('change', e => { resViewMode = e.target.value; viewDrop.hidden = true; updateDisplay(); });
-  });
-
-  reverseBtn.addEventListener('click', () => {
-    resReverseSort = !resReverseSort;
-    reverseBtn.classList.toggle('active', resReverseSort);
-    updateDisplay();
-  });
-
-  clearBtn.addEventListener('click', () => {
-    resFilters.organizations.clear();
-    resFilters.fields.clear();
-    document.querySelectorAll('#res-filter-drop input[type="checkbox"]').forEach(cb => { cb.checked = false; });
-    updateDisplay();
-  });
-
-  applyBtn.addEventListener('click', () => {
-    resFilters.organizations.clear();
-    resFilters.fields.clear();
-    document.querySelectorAll('#res-filter-drop input[type="checkbox"]:checked').forEach(cb => {
-      if (cb.dataset.type === 'org')   resFilters.organizations.add(cb.value);
-      if (cb.dataset.type === 'field') resFilters.fields.add(cb.value);
-    });
-    updateDisplay();
-  });
-
-  qEl.addEventListener('input', updateDisplay);
-
-  fetchResearch();
 }

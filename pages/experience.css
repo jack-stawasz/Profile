@@ -192,6 +192,21 @@ select.exp-search:invalid          { color: var(--muted); }
   min-width: 200px;
 }
 
+/* Hover opens a dropdown with a short fade (allspace I19); a click shows it at once, and closing is always immediate */
+.exp-dropdown.fade-in { animation: exp-drop-fade 100ms ease-out; }
+@keyframes exp-drop-fade { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .exp-dropdown.fade-in { animation: none; } }
+
+/* Spans the gap under the button while its dropdown is open, so the pointer can cross without leaving the hover */
+.exp-dropdown-wrap:has(> .exp-dropdown:not([hidden]))::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 300px;
+  height: 8px;
+}
+
 .exp-sort-drop   { min-width: 260px; }
 .exp-filter-drop { min-width: 300px; max-height: 420px; overflow-y: auto; }
 
@@ -790,3 +805,4 @@ select.exp-search:invalid          { color: var(--muted); }
   .textbook-item { flex-direction: column; align-items: center; }
   .textbook-cover { width: 140px; }
 }
+
