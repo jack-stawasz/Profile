@@ -6,9 +6,19 @@
       "description": "Wave functions, operators, and quantum states"
     },
     {
+      "name": "Quantum Field Theory",
+      "icon": "⚛️",
+      "description": "Feynman diagrams and scattering amplitudes"
+    },
+    {
       "name": "Classical Mechanics",
       "icon": "⚙️",
       "description": "Newtonian dynamics and Lagrangian formalism"
+    },
+    {
+      "name": "Fluid Mechanics",
+      "icon": "🌊",
+      "description": "Flow, vorticity, and the Navier-Stokes equations"
     },
     {
       "name": "Electricity & Magnetism",
@@ -21,9 +31,9 @@
       "description": "Spacetime and relativistic dynamics"
     },
     {
-      "name": "Optics",
+      "name": "Optics & Lasers",
       "icon": "🔬",
-      "description": "Wave and geometric optics principles"
+      "description": "Wave and geometric optics, laser alignment and spectroscopy"
     }
   ],
   "math": [
@@ -85,6 +95,11 @@
       "description": "Data analysis framework for physics"
     },
     {
+      "name": "ROS2",
+      "icon": "🤖",
+      "description": "Robot Operating System nodes, topics, and services"
+    },
+    {
       "name": "Git",
       "icon": "📦",
       "description": "Version control and collaboration"
@@ -115,11 +130,6 @@
       "name": "Oscilloscope",
       "icon": "📡",
       "description": "Signal analysis and measurement"
-    },
-    {
-      "name": "Lasers",
-      "icon": "🔴",
-      "description": "Optical alignment and spectroscopy"
     },
     {
       "name": "Optics Components",
