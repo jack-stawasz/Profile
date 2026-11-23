@@ -1,10 +1,12 @@
 /* ════════════════════════════════════════════════════════════
    Site Settings  –  settings.js
+   A settings dialog after All-Space's: a header, then rows of label, hint and control.
+   Palettes follow All-Space's tokens; style.css mixes every accent shade from --accent.
 ════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
 
-  /* ── Storage helpers ─────────────────────────────────────── */
+  /* ── Storage ─────────────────────────────────────────────── */
   function save(key, val) {
     try { localStorage.setItem('site_setting_' + key, JSON.stringify(val)); } catch (_) {}
   }
@@ -15,505 +17,283 @@
     } catch (_) { return fallback; }
   }
 
+  /* ── Palettes ────────────────────────────────────────────── */
+  // Base tokens only; style.css derives glass, glows, rings and the navbar fade from these
+  const PALETTES = {
+    midnight: {
+      label: 'Midnight',
+      scheme: 'dark',
+      colors: {
+        '--bg': '#121722', '--bg-deep': '#0c0f15', '--card': '#0e1116', '--container': '#1c2330',
+        '--border': '#283041', '--border-strong': '#3a4150',
+        '--accent': '#7dd3fc', '--accent-contrast': '#06121c',
+        '--text': '#e8edf2', '--muted': '#8b97a6',
+        '--shadow': 'rgba(0, 0, 0, 0.45)', '--overlay': 'rgba(0, 0, 0, 0.55)',
+      },
+    },
+    nord: {
+      label: 'Nord',
+      scheme: 'dark',
+      colors: {
+        '--bg': '#39414f', '--bg-deep': '#2b303b', '--card': '#2e3440', '--container': '#3b4252',
+        '--border': '#434c5e', '--border-strong': '#4c566a',
+        '--accent': '#88c0d0', '--accent-contrast': '#1b2330',
+        '--text': '#eceff4', '--muted': '#9aa5b8',
+        '--shadow': 'rgba(0, 0, 0, 0.45)', '--overlay': 'rgba(20, 24, 31, 0.55)',
+      },
+    },
+    ember: {
+      label: 'Ember',
+      scheme: 'dark',
+      colors: {
+        '--bg': '#271d1a', '--bg-deep': '#150f0e', '--card': '#1a1413', '--container': '#2f2320',
+        '--border': '#3b2c28', '--border-strong': '#503b35',
+        '--accent': '#ff8a5c', '--accent-contrast': '#2a0f06',
+        '--text': '#f4e9e2', '--muted': '#b89a8f',
+        '--shadow': 'rgba(0, 0, 0, 0.5)', '--overlay': 'rgba(10, 6, 5, 0.55)',
+      },
+    },
+    dawn: {
+      label: 'Dawn',
+      scheme: 'light',
+      colors: {
+        '--bg': '#eef2f8', '--bg-deep': '#e2e8f1', '--card': '#f6f8fb', '--container': '#ffffff',
+        '--border': '#d6dce6', '--border-strong': '#bcc5d4',
+        '--accent': '#3257d4', '--accent-contrast': '#ffffff',
+        '--text': '#1b2330', '--muted': '#5a6573',
+        '--shadow': 'rgba(27, 35, 48, 0.18)', '--overlay': 'rgba(27, 35, 48, 0.35)',
+      },
+    },
+  };
+  const DEFAULT_PALETTE = 'midnight';
+  // Themes saved by the old panel
+  const LEGACY = { dark: 'midnight', light: 'dawn', warm: 'ember' };
+
+  function resolvePalette(id) {
+    const name = LEGACY[id] || id;
+    return PALETTES[name] ? name : DEFAULT_PALETTE;
+  }
+
   /* ── State ───────────────────────────────────────────────── */
-  const today = new Date();
-  const todayDOY = dayOfYear(today);
+  const FONT_MIN = 70, FONT_MAX = 150, FONT_STEP = 5;
 
   const state = {
-    theme:      load('theme', 'dark'),
-    dateDOY:    load('dateDOY', todayDOY),
-    fontSize:   load('fontSize', 100),   // percent
+    theme:      resolvePalette(load('theme', DEFAULT_PALETTE)),
+    fontSize:   Math.min(FONT_MAX, Math.max(FONT_MIN, load('fontSize', 100))),
     animations: load('animations', true),
+    debug:      load('debug', false),
   };
 
-  /* ── Public API (window.SiteSettings) ───────────────────── */
   window.SiteSettings = {
-    getDate() {
-      return dateFromDOY(state.dateDOY, today.getFullYear());
-    },
     get animationsEnabled() { return state.animations; },
+    get debugMode() { return state.debug; },
     get theme() { return state.theme; },
   };
 
-  /* ── Helpers ─────────────────────────────────────────────── */
-  function dayOfYear(d) {
-    const start = new Date(d.getFullYear(), 0, 0);
-    const diff  = d - start;
-    return Math.floor(diff / 86400000);
-  }
+  /* ── Applying settings ───────────────────────────────────── */
+  let swapTimer = null;
 
-  function dateFromDOY(doy, year) {
-    const d = new Date(year, 0);
-    d.setDate(doy);
-    return d;
-  }
-
-  const MONTH_ABBR = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-
-  function formatDate(d) {
-    return `${MONTH_ABBR[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
-  }
-
-  /* ── Theme application ───────────────────────────────────── */
-  const THEMES = {
-    dark: {
-      '--bg':           '#0f1724',
-      '--bg-deep':      '#071021',
-      '--card':         '#0b1220',
-      '--container':    '#17253c',
-      '--glass':        'rgba(255,255,255,0.03)',
-      '--border':       'rgba(255,255,255,0.07)',
-      '--border-strong':'rgba(255,255,255,0.14)',
-      '--accent':       '#7dd3fc',
-      '--accent-glow':  'rgba(125,211,252,0.5)',
-      '--accent-dim':   'rgba(125,211,252,0.08)',
-      '--accent-mid':   'rgba(125,211,252,0.18)',
-      '--accent-ring':  'rgba(125,211,252,0.25)',
-      '--accent-border':'rgba(125,211,252,0.28)',
-      '--accent-hover': 'rgba(125,211,252,0.55)',
-      '--text':         '#e6eef6',
-      '--text-soft':    '#ccd8e4',
-      '--muted':        '#9aa4b2',
-      '--shadow':       'rgba(2,6,23,0.6)',
-      '--shadow-deep':  'rgba(2,6,23,0.9)',
-      '--overlay':      'rgba(0,0,0,0.6)',
-      '--navbar-bg':    'linear-gradient(180deg,#000 0%,rgba(0,0,0,0.8) 60%,transparent 100%)',
-    },
-    light: {
-      '--bg':           '#f0f4f8',
-      '--bg-deep':      '#dce6f0',
-      '--card':         '#ffffff',
-      '--container':    '#ffffff',
-      '--glass':        'rgba(0,0,0,0.03)',
-      '--border':       'rgba(0,0,0,0.09)',
-      '--border-strong':'rgba(0,0,0,0.18)',
-      '--accent':       '#0369a1',
-      '--accent-glow':  'rgba(3,105,161,0.4)',
-      '--accent-dim':   'rgba(3,105,161,0.08)',
-      '--accent-mid':   'rgba(3,105,161,0.15)',
-      '--accent-ring':  'rgba(3,105,161,0.22)',
-      '--accent-border':'rgba(3,105,161,0.3)',
-      '--accent-hover': 'rgba(3,105,161,0.5)',
-      '--text':         '#1a2535',
-      '--text-soft':    '#334155',
-      '--muted':        '#64748b',
-      '--shadow':       'rgba(0,0,0,0.12)',
-      '--shadow-deep':  'rgba(0,0,0,0.2)',
-      '--overlay':      'rgba(0,0,0,0.25)',
-      '--navbar-bg':    'linear-gradient(180deg,rgba(240,244,248,0.98) 0%,rgba(240,244,248,0.9) 60%,transparent 100%)',
-    },
-    warm: {
-      '--bg':           '#1a1208',
-      '--bg-deep':      '#0f0a02',
-      '--card':         '#1f1608',
-      '--container':    '#2a1e0d',
-      '--glass':        'rgba(255,200,100,0.03)',
-      '--border':       'rgba(255,200,100,0.08)',
-      '--border-strong':'rgba(255,200,100,0.16)',
-      '--accent':       '#f59e0b',
-      '--accent-glow':  'rgba(245,158,11,0.5)',
-      '--accent-dim':   'rgba(245,158,11,0.08)',
-      '--accent-mid':   'rgba(245,158,11,0.18)',
-      '--accent-ring':  'rgba(245,158,11,0.25)',
-      '--accent-border':'rgba(245,158,11,0.3)',
-      '--accent-hover': 'rgba(245,158,11,0.55)',
-      '--text':         '#fdf0d5',
-      '--text-soft':    '#e8d5a8',
-      '--muted':        '#b89a68',
-      '--shadow':       'rgba(10,5,0,0.7)',
-      '--shadow-deep':  'rgba(10,5,0,0.9)',
-      '--overlay':      'rgba(0,0,0,0.65)',
-      '--navbar-bg':    'linear-gradient(180deg,#0f0a02 0%,rgba(15,10,2,0.8) 60%,transparent 100%)',
-    },
-  };
-
-  function applyTheme(name) {
-    const vars = THEMES[name] || THEMES.dark;
+  function applyTheme(name, fade) {
+    const palette = PALETTES[name];
     const root = document.documentElement;
-    Object.entries(vars).forEach(([k, v]) => root.style.setProperty(k, v));
+    // Fade colors on a user's switch, never on first paint
+    if (fade && state.animations) {
+      root.classList.add('palette-swap');
+      clearTimeout(swapTimer);
+      swapTimer = setTimeout(() => root.classList.remove('palette-swap'), 400);
+    }
+    Object.entries(palette.colors).forEach(([k, v]) => root.style.setProperty(k, v));
+    root.style.colorScheme = palette.scheme;
     root.setAttribute('data-theme', name);
   }
 
-  /* ── Font size application ───────────────────────────────── */
   function applyFontSize(pct) {
     document.documentElement.style.fontSize = (pct / 100) + 'rem';
   }
 
-  /* ── Animations application ──────────────────────────────── */
   function applyAnimations(enabled) {
     document.body.classList.toggle('no-animations', !enabled);
   }
 
-  /* ── Apply saved state on load ───────────────────────────── */
-  function applyAll() {
-    applyTheme(state.theme);
-    applyFontSize(state.fontSize);
-    applyAnimations(state.animations);
+  /* ── Dialog building blocks ──────────────────────────────── */
+  function el(tag, className, text) {
+    const node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text !== undefined) node.textContent = text;
+    return node;
   }
 
-  /* ══════════════════════════════════════════════════════════
-     7-Segment display
-  ══════════════════════════════════════════════════════════ */
-  // Segment map: which segments are on for digits 0-9
-  // Segments: a(top) b(top-right) c(bot-right) d(bot) e(bot-left) f(top-left) g(mid)
-  const SEG_MAP = [
-    [1,1,1,1,1,1,0], // 0
-    [0,1,1,0,0,0,0], // 1
-    [1,1,0,1,1,0,1], // 2
-    [1,1,1,1,0,0,1], // 3
-    [0,1,1,0,0,1,1], // 4
-    [1,0,1,1,0,1,1], // 5
-    [1,0,1,1,1,1,1], // 6
-    [1,1,1,0,0,0,0], // 7
-    [1,1,1,1,1,1,1], // 8
-    [1,1,1,1,0,1,1], // 9
-  ];
-
-  function makeSegDigitSVG(digit) {
-    const on  = 'rgba(125,211,252,1)';
-    const off = 'rgba(125,211,252,0.08)';
-    const s   = digit < 0 ? Array(7).fill(0) : SEG_MAP[digit] || SEG_MAP[0];
-
-    // Segment colors based on state.theme
-    const accentOn  = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || on;
-    const accentOff = getComputedStyle(document.documentElement).getPropertyValue('--accent-dim').trim() || off;
-
-    function c(i) { return s[i] ? accentOn : accentOff; }
-    function glow(i) { return s[i] ? `filter:drop-shadow(0 0 4px ${accentOn})` : ''; }
-
-    // Using path-based segments (thick bar style) with padded viewBox to prevent clipping
-    return `<svg viewBox="-1.5 -1.5 23 37" xmlns="http://www.w3.org/2000/svg" style="display:block;overflow:visible">
-      <!-- a top -->
-      <path d="M3 2 L17 2 L15.5 3.5 L4.5 3.5 Z" fill="${c(0)}" style="${glow(0)}"/>
-      <!-- b top-right -->
-      <path d="M17.5 3 L18.5 15.5 L17 16.5 L16 4 Z" fill="${c(1)}" style="${glow(1)}"/>
-      <!-- c bot-right -->
-      <path d="M17.5 19 L18.5 31 L17 32 L16 20 Z" fill="${c(2)}" style="${glow(2)}"/>
-      <!-- d bot -->
-      <path d="M3 32 L17 32 L15.5 30.5 L4.5 30.5 Z" fill="${c(3)}" style="${glow(3)}"/>
-      <!-- e bot-left -->
-      <path d="M2.5 19 L3.5 31 L4 20 L3 16.5 Z" fill="${c(4)}" style="${glow(4)}"/>
-      <!-- f top-left -->
-      <path d="M2.5 3 L3.5 15.5 L4 16.5 L3 4 Z" fill="${c(5)}" style="${glow(5)}"/>
-      <!-- g mid -->
-      <path d="M4 16 L16 16 L16.5 17 L16 18 L4 18 L3.5 17 Z" fill="${c(6)}" style="${glow(6)}"/>
-    </svg>`;
+  // One line of the dialog: label and hint on the left, the control on the right
+  function row(label, hint, control, opts = {}) {
+    const r = el('div', 'settings-row' + (opts.stacked ? ' stacked' : ''));
+    const text = el('div', 'settings-row-text');
+    const lab = el(opts.forId ? 'label' : 'div', 'settings-row-label', label);
+    if (opts.forId) lab.htmlFor = opts.forId;
+    text.appendChild(lab);
+    if (hint) text.appendChild(el('div', 'settings-row-hint', hint));
+    r.appendChild(text);
+    r.appendChild(control);
+    return r;
   }
 
-  function createSegClock() {
-    const box = document.createElement('div');
-    box.className = 'seg-clock-box';
+  function buildThemeControl() {
+    const group = el('div', 'settings-swatches');
+    group.setAttribute('role', 'radiogroup');
+    group.setAttribute('aria-label', 'Color theme');
 
-    const wrap = document.createElement('div');
-    wrap.className = 'seg-clock';
-    wrap.id = 'seg-clock';
+    Object.entries(PALETTES).forEach(([id, p]) => {
+      const btn = el('button', 'settings-swatch');
+      btn.type = 'button';
+      btn.setAttribute('role', 'radio');
+      btn.dataset.palette = id;
 
-    // H H : M M : S S  AM/PM
-    const ids = ['ch0','ch1','sep1','cm0','cm1','sep2','cs0','cs1'];
-    ids.forEach(id => {
-      if (id.startsWith('sep')) {
-        const sep = document.createElement('div');
-        sep.className = 'seg-sep';
-        sep.innerHTML = '<div class="seg-sep-dot"></div><div class="seg-sep-dot"></div>';
-        sep.id = id;
-        wrap.appendChild(sep);
-      } else {
-        const d = document.createElement('div');
-        d.className = 'seg-digit';
-        d.id = id;
-        wrap.appendChild(d);
-      }
+      // A miniature of the palette: page, a card on it, and the accent
+      const c = p.colors;
+      const preview = el('span', 'settings-swatch-preview');
+      preview.style.background = `linear-gradient(180deg, ${c['--bg']}, ${c['--bg-deep']})`;
+      preview.style.borderColor = c['--border'];
+      const card = el('span', 'settings-swatch-card');
+      card.style.background = c['--container'];
+      card.style.borderColor = c['--border-strong'];
+      const line = el('span', 'settings-swatch-line');
+      line.style.background = c['--muted'];
+      const dot = el('span', 'settings-swatch-accent');
+      dot.style.background = c['--accent'];
+      card.append(dot, line);
+      preview.appendChild(card);
+
+      btn.append(preview, el('span', 'settings-swatch-label', p.label));
+      btn.addEventListener('click', () => {
+        state.theme = id;
+        save('theme', id);
+        applyTheme(id, true);
+        syncSwatches(group);
+      });
+      group.appendChild(btn);
     });
 
-    const ampm = document.createElement('div');
-    ampm.className = 'seg-ampm';
-    ampm.id = 'seg-ampm';
-    wrap.appendChild(ampm);
-
-    box.appendChild(wrap);
-    return box;
+    syncSwatches(group);
+    return group;
   }
 
-  function updateSegClock() {
-    const now  = new Date();
-    let   h    = now.getHours();
-    const m    = now.getMinutes();
-    const s    = now.getSeconds();
-    const ampm = h >= 12 ? 'PM' : 'AM';
-    h = h % 12 || 12;
-
-    const digits = [
-      Math.floor(h / 10) || -1,  // leading zero hidden
-      h % 10,
-      Math.floor(m / 10),
-      m % 10,
-      Math.floor(s / 10),
-      s % 10,
-    ];
-    const ids = ['ch0','ch1','cm0','cm1','cs0','cs1'];
-    ids.forEach((id, i) => {
-      const el = document.getElementById(id);
-      if (el) el.innerHTML = makeSegDigitSVG(digits[i]);
+  function syncSwatches(group) {
+    group.querySelectorAll('.settings-swatch').forEach(b => {
+      const on = b.dataset.palette === state.theme;
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-checked', on);
     });
-    const ampmEl = document.getElementById('seg-ampm');
-    if (ampmEl) ampmEl.textContent = ampm;
   }
 
-  /* ══════════════════════════════════════════════════════════
-     Build the panel
-  ══════════════════════════════════════════════════════════ */
-  function buildPanel() {
-    /* ── overlay wrapper ── */
-    const overlay = document.createElement('div');
-    overlay.className = 'settings-overlay';
+  function buildFontControl() {
+    const wrap = el('div', 'settings-font');
+    const slider = el('input', 'settings-slider');
+    slider.type = 'range';
+    slider.id = 'settings-font';
+    slider.min = FONT_MIN;
+    slider.max = FONT_MAX;
+    slider.step = FONT_STEP;
+    slider.value = state.fontSize;
+
+    const val = el('span', 'settings-font-val');
+    const reset = el('button', 'settings-button', 'Reset');
+    reset.type = 'button';
+
+    function sync() {
+      const pct = ((slider.value - FONT_MIN) / (FONT_MAX - FONT_MIN) * 100).toFixed(1) + '%';
+      slider.style.setProperty('--slider-pct', pct);
+      val.textContent = slider.value + '%';
+      reset.disabled = Number(slider.value) === 100;
+    }
+
+    function set(pct) {
+      state.fontSize = pct;
+      save('fontSize', pct);
+      slider.value = pct;
+      sync();
+      applyFontSize(pct);
+    }
+
+    slider.addEventListener('input', () => set(Number(slider.value)));
+    reset.addEventListener('click', () => set(100));
+    sync();
+
+    wrap.append(slider, val, reset);
+    return wrap;
+  }
+
+  // A switch for one boolean in state, saved under the same key
+  function buildToggle(id, key, onChange) {
+    const toggle = el('label', 'settings-toggle');
+    const input = el('input');
+    input.type = 'checkbox';
+    input.id = id;
+    input.checked = state[key];
+    input.addEventListener('change', () => {
+      state[key] = input.checked;
+      save(key, state[key]);
+      if (onChange) onChange(state[key]);
+    });
+    toggle.append(input, el('span', 'settings-toggle-track'));
+    return toggle;
+  }
+
+  /* ── Dialog ──────────────────────────────────────────────── */
+  function buildDialog() {
+    const overlay = el('div', 'settings-overlay');
     overlay.id = 'settings-overlay';
+    overlay.addEventListener('pointerdown', e => { if (e.target === overlay) closeDialog(); });
 
-    /* ── backdrop (click to close) ── */
-    const backdrop = document.createElement('div');
-    backdrop.className = 'settings-backdrop';
-    backdrop.addEventListener('click', closePanel);
-    overlay.appendChild(backdrop);
+    const dialog = el('div', 'settings-dialog');
+    dialog.setAttribute('role', 'dialog');
+    dialog.setAttribute('aria-modal', 'true');
+    dialog.setAttribute('aria-labelledby', 'settings-title');
 
-    /* ── panel ── */
-    const panel = document.createElement('div');
-    panel.className = 'settings-panel';
-    panel.setAttribute('role', 'dialog');
-    panel.setAttribute('aria-label', 'Site Settings');
+    const header = el('div', 'settings-header');
+    const title = el('h2', 'settings-title', 'Settings');
+    title.id = 'settings-title';
+    const close = el('button', 'settings-close', '✕');
+    close.type = 'button';
+    close.setAttribute('aria-label', 'Close settings');
+    close.addEventListener('click', closeDialog);
+    header.append(title, close);
 
-    /* header */
-    const header = document.createElement('div');
-    header.className = 'settings-panel-header';
-    header.innerHTML = `<h3>⚙ Site Settings</h3>`;
-    const closeBtn = document.createElement('button');
-    closeBtn.className = 'settings-close-btn';
-    closeBtn.innerHTML = '&times;';
-    closeBtn.setAttribute('aria-label', 'Close settings');
-    closeBtn.addEventListener('click', closePanel);
-    header.appendChild(closeBtn);
-    panel.appendChild(header);
+    const content = el('div', 'settings-content');
+    content.append(
+      row('Color theme', null, buildThemeControl(), { stacked: true }),
+      row('Text size', 'Scales all text on the site', buildFontControl(), { forId: 'settings-font' }),
+      row('Animations', 'Banner trace, card particles and logo effects', buildToggle('settings-anim', 'animations',
+        on => {
+          applyAnimations(on);
+          if (window._applyBannerState) window._applyBannerState(on);
+        }), { forId: 'settings-anim' }),
+      row('Debug mode', "Shows the Fourier arm drawing the home banner's trace", buildToggle('settings-debug', 'debug'),
+        { forId: 'settings-debug' }),
+    );
 
-    /* ─── Group: Theme ─── */
-    const themeGroup = document.createElement('div');
-    themeGroup.className = 'settings-group';
-    themeGroup.innerHTML = `<label class="settings-label" for="settings-theme">Color Theme</label>`;
-    const themeSelect = document.createElement('select');
-    themeSelect.className = 'settings-select';
-    themeSelect.id = 'settings-theme';
-    [['dark','🌑 Dark'],['light','☀️ Light'],['warm','🕯 Warm']].forEach(([val, label]) => {
-      const opt = document.createElement('option');
-      opt.value = val;
-      opt.textContent = label;
-      if (val === state.theme) opt.selected = true;
-      themeSelect.appendChild(opt);
-    });
-    themeSelect.addEventListener('change', () => {
-      state.theme = themeSelect.value;
-      save('theme', state.theme);
-      applyTheme(state.theme);
-    });
-    themeGroup.appendChild(themeSelect);
-    panel.appendChild(themeGroup);
-
-    /* ─── Group: Simulated Date ─── */
-    const dateGroup = document.createElement('div');
-    dateGroup.className = 'settings-group';
-
-    const dateHeader = document.createElement('div');
-    dateHeader.className = 'settings-date-header';
-
-    const dateLabelEl = document.createElement('span');
-    dateLabelEl.className = 'settings-label';
-    dateLabelEl.style.marginBottom = '0';
-    dateLabelEl.textContent = 'Simulated Date';
-
-    const todayBtn = document.createElement('button');
-    todayBtn.className = 'settings-today-btn';
-    todayBtn.textContent = 'Today';
-    todayBtn.setAttribute('aria-label', 'Reset to today');
-
-    dateHeader.appendChild(dateLabelEl);
-    dateHeader.appendChild(todayBtn);
-    dateGroup.appendChild(dateHeader);
-
-    const dateDisplay = document.createElement('div');
-    dateDisplay.className = 'settings-date-display';
-    dateDisplay.id = 'settings-date-display';
-    dateDisplay.textContent = formatDate(window.SiteSettings.getDate());
-
-    const dateSlider = document.createElement('input');
-    dateSlider.type = 'range';
-    dateSlider.min  = 1;
-    dateSlider.max  = 365;
-    dateSlider.value = state.dateDOY;
-    dateSlider.className = 'settings-slider';
-    dateSlider.id = 'settings-date-slider';
-    dateSlider.setAttribute('aria-label', 'Simulated day of year');
-
-    function syncDateSlider() {
-      const pct = ((dateSlider.value - 1) / 364 * 100).toFixed(1) + '%';
-      dateSlider.style.setProperty('--slider-pct', pct);
-      dateDisplay.textContent = formatDate(dateFromDOY(Number(dateSlider.value), today.getFullYear()));
-    }
-    syncDateSlider();
-
-    dateSlider.addEventListener('input', () => {
-      state.dateDOY = Number(dateSlider.value);
-      save('dateDOY', state.dateDOY);
-      syncDateSlider();
-      if (window._refreshSidebar) window._refreshSidebar();
-    });
-
-    todayBtn.addEventListener('click', () => {
-      state.dateDOY = todayDOY;
-      save('dateDOY', state.dateDOY);
-      dateSlider.value = todayDOY;
-      syncDateSlider();
-      if (window._refreshSidebar) window._refreshSidebar();
-    });
-
-    const ticks = document.createElement('div');
-    ticks.className = 'date-slider-ticks';
-    ticks.innerHTML = '<span>Jan</span><span>Apr</span><span>Jul</span><span>Oct</span><span>Dec</span>';
-
-    dateGroup.appendChild(dateDisplay);
-    dateGroup.appendChild(dateSlider);
-    dateGroup.appendChild(ticks);
-    panel.appendChild(dateGroup);
-
-    /* ─── Group: Font Size ─── */
-    const fontGroup = document.createElement('div');
-    fontGroup.className = 'settings-group';
-    fontGroup.innerHTML = `<span class="settings-label">Font Size</span>`;
-
-    const fontSliderRow = document.createElement('div');
-    fontSliderRow.className = 'settings-font-slider-row';
-
-    const aSmall = document.createElement('span');
-    aSmall.className = 'settings-font-a-small';
-    aSmall.textContent = 'A';
-
-    const fontSliderWrap = document.createElement('div');
-    fontSliderWrap.className = 'settings-font-slider-wrap';
-
-    const fontVal = document.createElement('div');
-    fontVal.className = 'settings-font-val';
-    fontVal.id = 'settings-font-val';
-    fontVal.textContent = state.fontSize + '%';
-
-    const fontSlider = document.createElement('input');
-    fontSlider.type = 'range';
-    fontSlider.min = 70;
-    fontSlider.max = 150;
-    fontSlider.step = 5;
-    fontSlider.value = state.fontSize;
-    fontSlider.className = 'settings-slider';
-    fontSlider.setAttribute('aria-label', 'Font size');
-
-    function syncFontSlider() {
-      const pct = ((fontSlider.value - 70) / 80 * 100).toFixed(1) + '%';
-      fontSlider.style.setProperty('--slider-pct', pct);
-      fontVal.textContent = fontSlider.value + '%';
-    }
-    syncFontSlider();
-
-    fontSlider.addEventListener('input', () => {
-      state.fontSize = Number(fontSlider.value);
-      save('fontSize', state.fontSize);
-      syncFontSlider();
-      applyFontSize(state.fontSize);
-    });
-
-    const aLarge = document.createElement('span');
-    aLarge.className = 'settings-font-a-large';
-    aLarge.textContent = 'A';
-
-    const resetFontBtn = document.createElement('button');
-    resetFontBtn.className = 'settings-font-reset';
-    resetFontBtn.textContent = 'Reset';
-    resetFontBtn.addEventListener('click', () => {
-      state.fontSize = 100;
-      save('fontSize', 100);
-      fontSlider.value = 100;
-      syncFontSlider();
-      applyFontSize(100);
-    });
-
-    fontSliderWrap.appendChild(fontVal);
-    fontSliderWrap.appendChild(fontSlider);
-    fontSliderRow.appendChild(aSmall);
-    fontSliderRow.appendChild(fontSliderWrap);
-    fontSliderRow.appendChild(aLarge);
-    fontSliderRow.appendChild(resetFontBtn);
-    fontGroup.appendChild(fontSliderRow);
-    panel.appendChild(fontGroup);
-
-    /* ─── Group: Clock ─── */
-    const clockGroup = document.createElement('div');
-    clockGroup.className = 'settings-group';
-    clockGroup.innerHTML = `<span class="settings-label">Current Time</span>`;
-    const clock = createSegClock();
-    clockGroup.appendChild(clock);
-    panel.appendChild(clockGroup);
-
-    /* ─── Group: Animation Intensity ─── */
-    const animGroup = document.createElement('div');
-    animGroup.className = 'settings-group';
-
-    const animRow = document.createElement('div');
-    animRow.className = 'settings-toggle-row';
-
-    const animLabel = document.createElement('div');
-    animLabel.innerHTML = `<span class="settings-toggle-label">Animations</span>`;
-
-    const toggleWrap = document.createElement('label');
-    toggleWrap.className = 'settings-toggle';
-    toggleWrap.setAttribute('aria-label', 'Toggle animations');
-
-    const toggleInput = document.createElement('input');
-    toggleInput.type = 'checkbox';
-    toggleInput.checked = state.animations;
-    toggleInput.id = 'settings-anim-toggle';
-
-    const toggleTrack = document.createElement('div');
-    toggleTrack.className = 'settings-toggle-track';
-
-    toggleWrap.appendChild(toggleInput);
-    toggleWrap.appendChild(toggleTrack);
-
-    toggleInput.addEventListener('change', () => {
-      state.animations = toggleInput.checked;
-      save('animations', state.animations);
-      applyAnimations(state.animations);
-      if (window._applyBannerState) window._applyBannerState(state.animations);
-    });
-
-    animRow.appendChild(animLabel);
-    animRow.appendChild(toggleWrap);
-    animGroup.appendChild(animRow);
-    panel.appendChild(animGroup);
-
-    overlay.appendChild(panel);
+    dialog.append(header, content);
+    overlay.appendChild(dialog);
     document.body.appendChild(overlay);
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && overlay.classList.contains('open')) closeDialog();
+    });
   }
 
-  /* ── Gear button ─────────────────────────────────────────── */
   function buildGearBtn() {
-    const btn = document.createElement('button');
-    btn.className = 'settings-btn';
+    const btn = el('button', 'settings-btn');
+    btn.type = 'button';
     btn.id = 'settings-gear-btn';
     btn.setAttribute('aria-label', 'Open site settings');
-    btn.setAttribute('title', 'Site Settings');
+    btn.setAttribute('aria-haspopup', 'dialog');
+    btn.title = 'Settings';
     btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <circle cx="12" cy="12" r="3"/>
       <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
     </svg>`;
-
     btn.addEventListener('click', () => {
-      const isOpen = btn.classList.contains('open');
-      isOpen ? closePanel() : openPanel();
+      document.getElementById('settings-overlay').classList.contains('open') ? closeDialog() : openDialog();
     });
 
-    // Inject into nav-right
     const navRight = document.querySelector('.nav-right');
     if (navRight) {
       navRight.style.display = 'flex';
@@ -522,31 +302,29 @@
     }
   }
 
-  let clockInterval = null;
-
-  function openPanel() {
-    const overlay = document.getElementById('settings-overlay');
-    const btn     = document.getElementById('settings-gear-btn');
-    if (!overlay || !btn) return;
-    overlay.classList.add('open');
-    btn.classList.add('open');
-    updateSegClock();
-    clockInterval = setInterval(updateSegClock, 1000);
+  function openDialog() {
+    document.getElementById('settings-overlay').classList.add('open');
+    document.getElementById('settings-gear-btn').classList.add('open');
+    document.querySelector('.settings-swatch.active')?.focus();
   }
 
-  function closePanel() {
+  function closeDialog() {
     const overlay = document.getElementById('settings-overlay');
-    const btn     = document.getElementById('settings-gear-btn');
-    if (!overlay || !btn) return;
+    if (!overlay.classList.contains('open')) return;
     overlay.classList.remove('open');
+    const btn = document.getElementById('settings-gear-btn');
     btn.classList.remove('open');
-    if (clockInterval) { clearInterval(clockInterval); clockInterval = null; }
+    btn.focus();
   }
 
   /* ── Init ────────────────────────────────────────────────── */
+  // Colors and size go on <html> right away so the first paint already has them
+  applyTheme(state.theme, false);
+  applyFontSize(state.fontSize);
+
   function init() {
-    applyAll();
-    buildPanel();
+    applyAnimations(state.animations);
+    buildDialog();
     buildGearBtn();
   }
 
@@ -555,5 +333,4 @@
   } else {
     init();
   }
-
 })();
